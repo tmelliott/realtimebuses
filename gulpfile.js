@@ -47,3 +47,5 @@ gulp.task('serve', ['sass', 'scripts'], function() {
     gulp.watch('assets/scripts/**/*.js', ['scripts']);
     gulp.watch(['*.html', 'assets/js/app.min.js'], { cwd: ''}, reload);
 });
+
+gulp.task('default', ['serve']);
