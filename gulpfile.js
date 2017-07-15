@@ -38,7 +38,11 @@ gulp.task('scripts', function() {
 gulp.task('serve', ['sass', 'scripts'], function() {
     browserSync({
         server: {
-            baseDir: ''
+            baseDir: '',
+            middleware: function (req, res, next) {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                next();
+            }
         },
         open: false
     });

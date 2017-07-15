@@ -10409,6 +10409,9 @@ h1, h2, h3 {
 .panel-lower {
   height: 20%; }
 
+table {
+  font-size: 10px; }
+
 #displayNetwork, #displayRoute {
   margin-top: 25%;
   text-align: center;

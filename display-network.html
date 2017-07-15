@@ -24,7 +24,30 @@
             </div>
             <div class="col-md-4">
                 <section id="networkStatus" class="full-height">
-                    [[ %on time and distribution of delays ]]
+                    <h1><span id="nwPerc">?</span>% on time</h1>
+
+                    [[ graph shows day's trace of % on time ]]
+
+                    <table class="table">
+                        <tr>
+                            <th>&gt 5min early</th>
+                            <th>1&ndash;5min early</th>
+                            <th>on time</th>
+                            <th>5&ndash;10min late</th>
+                            <th>10&ndash;20min late</th>
+                            <th>20&ndash;30min late</th>
+                            <th>&gt;30min late</th>
+                        </tr>
+                        <tr>
+                            <td id="deltab0"></td>
+                            <td id="deltab1"></td>
+                            <td id="deltab2"></td>
+                            <td id="deltab3"></td>
+                            <td id="deltab4"></td>
+                            <td id="deltab5"></td>
+                            <td id="deltab6"></td>
+                        </tr>
+                    </table>
                 </section>
             </div>
         </div>
