@@ -10390,11 +10390,61 @@ html, body, #mainContainer {
   padding: 5px; }
 
 section {
-  height: 100%;
   padding: 5px; }
+  section.half-height {
+    height: 50%; }
+  section.full-height {
+    height: 100%; }
 
 h1, h2, h3 {
   margin-top: 0; }
+
+.column {
+  height: 100%;
+  padding-bottom: 5px; }
+
+.panel-upper {
+  height: 80%; }
+
+.panel-lower {
+  height: 20%; }
+
+#displayNetwork, #displayRoute {
+  margin-top: 25%;
+  text-align: center;
+  position: relative;
+  transition: all 200ms ease-in-out; }
+  #displayNetwork h1, #displayRoute h1 {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    -webkit-transform: translateY(-50%);
+            transform: translateY(-50%); }
+  #displayNetwork:hover, #displayRoute:hover {
+    cursor: pointer;
+    -webkit-transform: scale(1.02);
+            transform: scale(1.02);
+    z-index: 1; }
+
+#displayNetwork {
+  background: orange;
+  margin-right: 10%; }
+
+#displayRoute {
+  background: lightblue;
+  margin-left: 10%; }
+
+#networkMap {
+  background: #cccccc;
+  margin-bottom: 5px; }
+
+#networkRegions {
+  background: lightblue;
+  margin-top: 5px; }
+
+#networkStatus {
+  background: lightgreen; }
 
 #routeInfo {
   background: lightblue; }

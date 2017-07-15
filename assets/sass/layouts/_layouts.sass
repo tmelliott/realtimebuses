@@ -8,8 +8,20 @@ html, body, #mainContainer
     padding: $grid-gutter-width
 
 section
-    height: 100%
     padding: $grid-gutter-width
+
+    &.half-height
+        height: 50%
+    &.full-height
+        height: 100%
 
 h1, h2, h3
     margin-top: 0
+
+.column
+    height: 100%
+    padding-bottom: $grid-gutter-width
+.panel-upper
+    height: $network-upper-panel-height
+.panel-lower
+    height: $network-lower-panel-height
