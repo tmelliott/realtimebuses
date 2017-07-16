@@ -21,8 +21,47 @@ function networkMap () {
         maxZoom: 19
     }).addTo(map);
 
-    var svg = d3.select(map.getPanes().overlayPane).append("svg"),
-        g = svg.append("g").attr("class", "leaflet-zoom-hide");
+    var data = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [174.7633, -36.8485]
+                },
+                "properties": {
+                  "delay": 30,
+                  "delaytype": "departure"
+                }
+            }
+        ]
+    };
+
+    var pts = L.geoJSON(data, {
+        pointToLayer: function(feature, latlng) {
+            return L.circleMarker(latlng, {
+                radius: 2,
+                fillColor: "#990000",
+                weight: 0,
+                fillOpacity: 0.8
+            });
+        }
+    }).addTo(map);
+    // setTimeout(function () {
+    //     pts.clearLayers();
+    //
+    // }, 1000);
+
+    // var svg = d3.select(map.getPanes().overlayPane).append("svg"),
+    //     g = svg.append("g").attr("class", "leaflet-zoom-hide");
+    //
+    // d3.json("data/vp.json", function(error, collection) {
+    //     if (error) throw error;
+    //
+    //     var transform = d3.geo.transform({point: projectPoint}),
+    //       path = d3.geo.path().projection(transform);
+    // });
 };
 
 function networkStatus () {
@@ -70,4 +109,10 @@ function setStatus (data) {
     for (i=0;i<tab.length; i++) {
         $("#deltab" + i).html(tab[i]);
     }
+};
+
+
+function projectPoint(x, y) {
+    var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+    this.stream.point(point.x, point.y);
 };
