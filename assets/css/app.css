@@ -10441,6 +10441,9 @@ table {
 #networkMap {
   background: #cccccc;
   margin-bottom: 5px; }
+  #networkMap #map {
+    width: 100%;
+    height: 100%; }
 
 #networkRegions {
   background: lightblue;

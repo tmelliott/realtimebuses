@@ -1,9 +1,3 @@
-$(document).ready(function () {
-    indexBtns();
-
-    networkStatus();
-});
-
 
 function indexBtns () {
     $("#displayNetwork").on("click", function(e) {
@@ -15,6 +9,21 @@ function indexBtns () {
 };
 
 
+function networkMap () {
+    var map = new L.Map("map", {
+        center: [-36.8485, 174.7633],
+        zoom: 10,
+        zoomControl: false
+    });
+    L.tileLayer('http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+
+    var svg = d3.select(map.getPanes().overlayPane).append("svg"),
+        g = svg.append("g").attr("class", "leaflet-zoom-hide");
+};
 
 function networkStatus () {
     protobuf.load("assets/protobuf/gtfs-realtime.proto", function(err, root) {
