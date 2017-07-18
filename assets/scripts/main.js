@@ -144,3 +144,51 @@ function projectPoint(x, y) {
     var point = map.latLngToLayerPoint(new L.LatLng(y, x));
     this.stream.point(point.x, point.y);
 };
+
+
+function loadQR() {
+    setQR();
+    setInterval(setQR, 1000); // reload QR-code every 10 minutes
+};
+
+function setQR() {
+    $("#qrcode").html("");
+    var hash = generateHash(6);
+    $("#qrcode").qrcode({
+        render: 'canvas',
+        size: 300,
+        text: 'tomelliott.co.nz/realtimebuses/choose_a_route.html?h='+hash,
+        radius: 0,
+        quiet: 2
+        // mode: 2,
+        // mSize: 0.10,
+        // label: 'Choose A Route',
+        // fontname: 'Ubuntu',
+        // fontcolor: "#2f7cc9"
+    });
+};
+
+function getHash() {
+    $("#hash").html(GetURLParameter("h"));
+};
+
+function GetURLParameter(sParam) {
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i=0; i<sURLVariables.length; i++) {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) {
+            return sParameterName[1];
+        }
+    }
+    return '';
+}
+
+function generateHash(len) {
+    var hash = "";
+    var chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i=0; i<len; i++) {
+        hash += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return hash;
+}
