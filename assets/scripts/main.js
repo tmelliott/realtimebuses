@@ -31,7 +31,7 @@ function networkMap () {
           var f = root.lookupType("transit_realtime.FeedMessage");
 
           var xhr = new XMLHttpRequest();
-          var vp = "https://dl.dropboxusercontent.com/s/3o9j4ltzyu5d4p0/vehicle_locations.pb?dl=1";
+          var vp = "https://dl.dropboxusercontent.com/s/z1nqu2xu9nhfjbk/vehicle_locations.pb?dl=1";
           xhr.open("GET", vp, true);
           xhr.responseType = "arraybuffer";
           xhr.onload = function(evt) {
@@ -98,7 +98,8 @@ function fetchNetworkData () {
         var f = root.lookupType("transit_realtime.FeedMessage");
 
         var xhr = new XMLHttpRequest();
-        var tu = "https://dl.dropboxusercontent.com/s/unehec9x3dbgnmp/trip_updates.pb?dl=1";
+
+        var tu = "https://dl.dropboxusercontent.com/s/4dodhqmz8vsi9vx/trip_updates.pb?dl=1";
         xhr.open("GET", tu, true);
         xhr.responseType = "arraybuffer";
         xhr.onload = function(evt) {
