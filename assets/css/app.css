@@ -10388,6 +10388,8 @@ html, body, #mainContainer {
 
 #mainContainer {
   padding: 5px; }
+  #mainContainer.bgblack {
+    background: black; }
 
 section {
   padding: 5px; }
@@ -10440,7 +10442,8 @@ table {
 
 #networkMap {
   background: #cccccc;
-  margin-bottom: 5px; }
+  margin-bottom: 5px;
+  padding: 0; }
   #networkMap #map {
     width: 100%;
     height: 100%; }
@@ -10450,7 +10453,7 @@ table {
   margin-top: 5px; }
 
 #networkStatus {
-  background: lightgreen; }
+  background: white; }
 
 #routeInfo {
   background: lightblue; }
