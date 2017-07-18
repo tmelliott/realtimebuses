@@ -10390,26 +10390,21 @@ html, body, #mainContainer {
   padding: 5px; }
   #mainContainer.bgblack {
     background: black; }
-
-section {
-  padding: 5px; }
-  section.half-height {
-    height: 50%; }
-  section.full-height {
-    height: 100%; }
-
-h1, h2, h3 {
-  margin-top: 0; }
-
-.column {
-  height: 100%;
-  padding-bottom: 5px; }
-
-.panel-upper {
-  height: 80%; }
-
-.panel-lower {
-  height: 20%; }
+  #mainContainer section {
+    padding: 5px; }
+    #mainContainer section.half-height {
+      height: 50%; }
+    #mainContainer section.full-height {
+      height: 100%; }
+  #mainContainer h1, #mainContainer h2, #mainContainer h3 {
+    margin-top: 0; }
+  #mainContainer .column {
+    height: 100%;
+    padding-bottom: 5px; }
+  #mainContainer .panel-upper {
+    height: 80%; }
+  #mainContainer .panel-lower {
+    height: 20%; }
 
 table {
   font-size: 10px; }
