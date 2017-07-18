@@ -82,13 +82,14 @@ function networkMap () {
       }).addTo(map);
     };
 
-    loadData();
-    setTimeout(function () {
-        loadData();
-    }, 10000);
+    setInterval(loadData, 10000);
 };
 
 function networkStatus () {
+    setInterval(fetchNetworkData, 10000);
+};
+
+function fetchNetworkData () {
     protobuf.load("assets/protobuf/gtfs-realtime.proto", function(err, root) {
         if (err)
             throw err;
