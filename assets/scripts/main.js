@@ -42,7 +42,7 @@ function networkMap () {
       });
     };
     function addPositions (feed) {
-      console.log(feed);
+    //   console.log(feed);
       var data = {
           "type": "FeatureCollection",
           "features": []
@@ -66,9 +66,9 @@ function networkMap () {
             });
           }
         }
-        console.log(feed[i]);
+        // console.log(feed[i]);
       }
-      console.log(data);
+    //   console.log(data);
       if (pts != undefined) pts.clearLayers();
       pts = L.geoJSON(data, {
           pointToLayer: function(feature, latlng) {
