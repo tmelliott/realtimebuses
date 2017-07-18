@@ -148,7 +148,7 @@ function projectPoint(x, y) {
 
 function loadQR() {
     setQR();
-    setInterval(setQR, 1000); // reload QR-code every 10 minutes
+    setInterval(setQR, 1000 * 60 * 10); // reload QR-code every 10 minutes
 };
 
 function setQR() {
