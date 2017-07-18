@@ -82,10 +82,12 @@ function networkMap () {
       }).addTo(map);
     };
 
+    loadData();
     setInterval(loadData, 10000);
 };
 
 function networkStatus () {
+    fetchNetworkData();
     setInterval(fetchNetworkData, 10000);
 };
 
