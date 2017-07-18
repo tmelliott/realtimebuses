@@ -10451,7 +10451,15 @@ table {
   background: white; }
 
 #routeInfo {
-  background: lightblue; }
+  background: white;
+  position: relative; }
+  #routeInfo .qr {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 30%; }
+    #routeInfo .qr img {
+      width: 100%; }
 
 #routeMap {
   background: #cccccc; }
