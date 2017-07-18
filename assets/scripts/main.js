@@ -83,10 +83,9 @@ function networkMap () {
     };
 
     loadData();
-    // setTimeout(function () {
-    //     pts.clearLayers();
-    //
-    // }, 1000);
+    setTimeout(function () {
+        loadData();
+    }, 10000);
 };
 
 function networkStatus () {
