@@ -160,11 +160,6 @@ function setQR() {
         text: 'tomelliott.co.nz/realtimebuses/choose_a_route.html?h='+hash,
         radius: 0,
         quiet: 2
-        // mode: 2,
-        // mSize: 0.10,
-        // label: 'Choose A Route',
-        // fontname: 'Ubuntu',
-        // fontcolor: "#2f7cc9"
     });
 };
 

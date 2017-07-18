@@ -10435,11 +10435,11 @@ table {
   background: lightblue;
   margin-left: 10%; }
 
-#networkMap {
+section#networkMap {
   background: #cccccc;
   margin-bottom: 5px;
   padding: 0; }
-  #networkMap #map {
+  section#networkMap #map {
     width: 100%;
     height: 100%; }
 
