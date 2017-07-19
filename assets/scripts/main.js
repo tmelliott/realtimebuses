@@ -10,8 +10,8 @@ function indexBtns () {
 
 
 function networkMap () {
-    var map = new L.Map("map", {
-        center: [-36.8485, 174.7633],
+    map = new L.Map("map", {
+        center: [-36.81, 174.7633],
         zoom: 10,
         zoomControl: false
     });
@@ -108,8 +108,8 @@ function networkRegions () {
 function initRegions (regions) {
     for (var i=0;i<regions.length;i++) {
         $("#networkRegions").append("<div id=\"region" + regions[i].name +
-        "\" class=\"region-status\"><h1 class=\"state\"><span id=\"regionCity\">?</span>%</h1><h3 class=\"name\">" +
-        regions[i].name + "</h3></div>");
+        "\" class=\"region-status\"><h1 class=\"state\"><span id=\"regionCity\">?</span>%</h1><h4 class=\"name\">" +
+        regions[i].name + "</h4></div>");
     }
     setRegions(regions);
 };
@@ -118,16 +118,21 @@ function setRegions(regions) {
     for (var i=0;i<regions.length;i++) {
         $("#networkRegions #region" + regions[i].name + " .state span")
             .html(regions[i].status);
+        $("#region" + regions[i].name)
+            .removeClass("stateOK stateModerate stateHeavy stateBad");
         if (regions[i].status < 50) {
-            $("#region" + regions[i].name).css('background', '#990000');
+            $("#region" + regions[i].name).addClass("stateBad");
         } else if (regions[i].status < 60) {
-            $("#region" + regions[i].name).css('background', 'orangered');
+            $("#region" + regions[i].name).addClass("stateHeavy");
         } else if (regions[i].status < 80) {
-            $("#region" + regions[i].name).css('background', 'orange');
+            $("#region" + regions[i].name).addClass("stateModerate");
         } else {
-            $("#region" + regions[i].name).css('background', '#009900');
+            $("#region" + regions[i].name).addClass("stateOK");
         }
     }
+    // show the boxes
+    $("#networkRegions").css('height',
+        $($(".region-status")[0]).width());
 };
 
 function fetchNetworkData () {

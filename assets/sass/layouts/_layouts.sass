@@ -23,13 +23,13 @@ html, body, #mainContainer
 
     .column
         height: 100%
-        padding-bottom: $grid-gutter-width
+        display: flex
+        flex-direction: column
+        justify-content: space-between
+
     .panel-upper
-        height: $network-upper-panel-height
-    .panel-lower
-        height: $network-lower-panel-height
-
-
+        flex-grow: 1
+        position: relative
 
 table
     font-size: 10px
