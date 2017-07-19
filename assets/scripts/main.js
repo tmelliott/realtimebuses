@@ -91,6 +91,45 @@ function networkStatus () {
     setInterval(fetchNetworkData, 10000);
 };
 
+function networkRegions () {
+    var regions = [
+        {"name": "City", "status": 55},
+        {"name": "Isthmus", "status": 61},
+        {"name": "North", "status": 78},
+        {"name": "West", "status": 82},
+        {"name": "South", "status": 55},
+        {"name": "East", "status": 42},
+        {"name": "Waiheke", "status": 34},
+    ];
+    initRegions(regions);
+    setInterval(setRegions, 10000, regions);
+};
+
+function initRegions (regions) {
+    for (var i=0;i<regions.length;i++) {
+        $("#networkRegions").append("<div id=\"region" + regions[i].name +
+        "\" class=\"region-status\"><h1 class=\"state\"><span id=\"regionCity\">?</span>%</h1><h3 class=\"name\">" +
+        regions[i].name + "</h3></div>");
+    }
+    setRegions(regions);
+};
+
+function setRegions(regions) {
+    for (var i=0;i<regions.length;i++) {
+        $("#networkRegions #region" + regions[i].name + " .state span")
+            .html(regions[i].status);
+        if (regions[i].status < 50) {
+            $("#region" + regions[i].name).css('background', '#990000');
+        } else if (regions[i].status < 60) {
+            $("#region" + regions[i].name).css('background', 'orangered');
+        } else if (regions[i].status < 80) {
+            $("#region" + regions[i].name).css('background', 'orange');
+        } else {
+            $("#region" + regions[i].name).css('background', '#009900');
+        }
+    }
+};
+
 function fetchNetworkData () {
     protobuf.load("assets/protobuf/gtfs-realtime.proto", function(err, root) {
         if (err)
