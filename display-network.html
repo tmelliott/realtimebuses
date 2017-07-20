@@ -26,30 +26,48 @@
             </div>
             <div class="col-md-4">
                 <section id="networkStatus" class="full-height">
-                    <h1><span id="nwPerc">?</span>% on time</h1>
+                    <div class="panel1">
+                        <span class="nwstate">
+                            <span id="nwPerc">?</span>%</span>
+                        <span class='label'>of buses are on-time</span>
+                    </div>
 
-                    [[ graph shows day's trace of % on time ]]
+                    <div class="panel2">
+                        [[ graph shows day's trace of % on time ]]
 
-                    <table class="table">
-                        <tr>
-                            <th>&gt 5min early</th>
-                            <th>1&ndash;5min early</th>
-                            <th>on time</th>
-                            <th>5&ndash;10min late</th>
-                            <th>10&ndash;20min late</th>
-                            <th>20&ndash;30min late</th>
-                            <th>&gt;30min late</th>
-                        </tr>
-                        <tr>
-                            <td id="deltab0"></td>
-                            <td id="deltab1"></td>
-                            <td id="deltab2"></td>
-                            <td id="deltab3"></td>
-                            <td id="deltab4"></td>
-                            <td id="deltab5"></td>
-                            <td id="deltab6"></td>
-                        </tr>
-                    </table>
+                        <table class="table">
+                            <tr>
+                                <th>&gt 5min early</th>
+                                <th>1&ndash;5min early</th>
+                                <th>on time</th>
+                                <th>5&ndash;10min late</th>
+                                <th>10&ndash;20min late</th>
+                                <th>20&ndash;30min late</th>
+                                <th>&gt;30min late</th>
+                            </tr>
+                            <tr>
+                                <td id="deltab0"></td>
+                                <td id="deltab1"></td>
+                                <td id="deltab2"></td>
+                                <td id="deltab3"></td>
+                                <td id="deltab4"></td>
+                                <td id="deltab5"></td>
+                                <td id="deltab6"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="panel3">
+                        <p>
+                            <strong>The map shows real-time positions of buses in the Auckland Transport network</strong>. This data
+                            comes directly form Auckland Transport's public GTFS realtime API.
+                        </p>
+
+                        <p>
+                            <strong>On-time is defined as between 1 minute early and 5 minutes late</strong>, which is the region colored in green in the histogram.
+                            <strong>The breakdown by region</strong> is based on the location of the stop at which the delay was reported.
+                        </p>
+                    </div>
                 </section>
             </div>
         </div>
@@ -62,6 +80,8 @@
     <script type="text/javascript">
         /* Load modules for this page */
         var map;
+        $("#networkRegions").css('height',
+            $($(".region-status")[0]).width());
         networkMap();
         networkStatus();
         networkRegions();

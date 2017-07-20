@@ -10476,10 +10476,7 @@ section#networkRegions {
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  text-align: center;
-  height: 0;
-  overflow: hidden;
-  transition: height 1s ease-in-out; }
+  text-align: center; }
   section#networkRegions .region-status {
     -webkit-box-flex: 1;
         -ms-flex-positive: 1;
@@ -10487,14 +10484,60 @@ section#networkRegions {
     -ms-flex-preferred-size: 0;
         flex-basis: 0;
     margin: 5px 2.5px 0;
-    padding: 10px 0 5px; }
+    padding: 10px 0 5px;
+    transition: all 1s linear;
+    -webkit-perspective: 500px;
+            perspective: 500px; }
+    section#networkRegions .region-status .state {
+      transition: all 1s ease-in-out;
+      -webkit-transform: rotateY(90deg);
+              transform: rotateY(90deg); }
+      section#networkRegions .region-status .state.isset {
+        -webkit-transform: rotateY(0deg);
+                transform: rotateY(0deg); }
     section#networkRegions .region-status:first-child {
       margin-left: 0; }
     section#networkRegions .region-status:last-child {
       margin-right: 0; }
 
-#networkStatus {
-  background: white; }
+section#networkStatus {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 0; }
+  section#networkStatus .panel1 {
+    background: orange;
+    padding: 5px; }
+    section#networkStatus .panel1 .nwstate {
+      padding-left: 20px;
+      font-size: 82px;
+      line-height: 1;
+      display: inline-block; }
+    section#networkStatus .panel1 .label {
+      color: #333333;
+      font-size: 30px;
+      line-height: 1;
+      display: inline-block; }
+  section#networkStatus .panel2 {
+    background: white;
+    padding: 5px;
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    -ms-flex-preferred-size: 0;
+        flex-basis: 0;
+    margin: 5px 0; }
+  section#networkStatus .panel3 {
+    font-size: 22px;
+    background: lightblue;
+    padding: 5px; }
 
 #routeInfo {
   background: white;

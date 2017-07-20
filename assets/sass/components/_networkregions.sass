@@ -1,20 +1,24 @@
 section#networkRegions
-    // background: lightblue
-
     padding: 0
     display: flex
     justify-content: space-between
-
     text-align: center
-    height: 0
-    overflow: hidden
-    transition: height 1s ease-in-out
 
     .region-status
         flex-grow: 1
         flex-basis: 0
         margin: $grid-gutter-width $grid-gutter-width / 2 0
         padding: 10px 0 5px
+        transition: all 1s linear
+
+        perspective: 500px
+
+        .state
+            transition: all 1s ease-in-out
+            transform: rotateY(90deg)
+
+            &.isset
+                transform: rotateY(0deg)
 
         &:first-child
             margin-left: 0

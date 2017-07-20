@@ -1,2 +1,36 @@
-#networkStatus
-    background: white
+section#networkStatus
+    // background: white
+    display: flex
+    flex-direction: column
+    justify-content: space-between
+    padding: 0
+
+    .panel1
+        background: orange
+        padding: $grid-gutter-width
+
+        .nwstate
+            padding-left: 20px
+            font-size: 82px
+            line-height: 1
+            display: inline-block
+
+        .label
+            color: #333333
+            font-size: 30px
+            line-height: 1
+            display: inline-block
+            // height: 82px
+            // vertical-align: top
+
+    .panel2
+        background: white
+        padding: $grid-gutter-width
+        flex-grow: 1
+        flex-basis: 0
+        margin: $grid-gutter-width 0
+
+    .panel3
+        font-size: 22px
+        background: lightblue
+        padding: $grid-gutter-width
