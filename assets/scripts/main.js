@@ -170,16 +170,18 @@ function setStatus (feed) {
     function add (a, b) { return a + b; };
     var n = tab.reduce (add, 0);
     $("#nwPerc").html(Math.round(nw.ontime/n*100));
+    var nmax = 0;
     for (i=0;i<tab.length; i++) {
         $("#deltab" + i).html(tab[i]);
+        nmax = Math.max(nmax, tab[i]);
     }
-    $("#bargraph #earlier").height(nw.earlier / n * 100 + "%");
-    $("#bargraph #early").height(nw.early / n * 100 + "%");
-    $("#bargraph #ontime").height(nw.ontime / n * 100 + "%");
-    $("#bargraph #late").height(nw.late / n * 100 + "%");
-    $("#bargraph #later").height(nw.later / n * 100 + "%");
-    $("#bargraph #quitelate").height(nw.quitelate / n * 100 + "%");
-    $("#bargraph #verylate").height(nw.verylate / n * 100 + "%");
+    $("#bargraph #earlier").height(nw.earlier / nmax * 80 + "%");
+    $("#bargraph #early").height(nw.early / nmax * 80 + "%");
+    $("#bargraph #ontime").height(nw.ontime / nmax * 80 + "%");
+    $("#bargraph #late").height(nw.late / nmax * 80 + "%");
+    $("#bargraph #later").height(nw.later / nmax * 80 + "%");
+    $("#bargraph #quitelate").height(nw.quitelate / nmax * 80 + "%");
+    $("#bargraph #verylate").height(nw.verylate / nmax * 80 + "%");
 }
 
 // function old (data) {

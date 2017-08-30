@@ -10526,7 +10526,8 @@ section#networkStatus {
       line-height: 1;
       display: inline-block; }
   section#networkStatus .panel2 {
-    background: white;
+    background: black;
+    color: #eeeeee;
     padding: 5px;
     -webkit-box-flex: 1;
         -ms-flex-positive: 1;
@@ -10537,6 +10538,10 @@ section#networkStatus {
     section#networkStatus .panel2 table {
       table-layout: fixed;
       text-align: center; }
+      section#networkStatus .panel2 table td {
+        border-top: none; }
+      section#networkStatus .panel2 table th {
+        text-align: center; }
   section#networkStatus .panel3 {
     font-size: 22px;
     background: lightblue;
