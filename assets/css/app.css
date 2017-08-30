@@ -10534,10 +10534,39 @@ section#networkStatus {
     -ms-flex-preferred-size: 0;
         flex-basis: 0;
     margin: 5px 0; }
+    section#networkStatus .panel2 table {
+      table-layout: fixed;
+      text-align: center; }
   section#networkStatus .panel3 {
     font-size: 22px;
     background: lightblue;
     padding: 5px; }
+
+#bargraph {
+  margin-top: 10px; }
+  #bargraph td {
+    height: 300px;
+    position: relative; }
+    #bargraph td div {
+      position: absolute;
+      bottom: 0;
+      left: 10px;
+      right: 10px;
+      height: 0%;
+      background: green;
+      transition: height 2s ease-in-out; }
+      #bargraph td div#earlier {
+        background: #444444; }
+      #bargraph td div#early {
+        background: #cccccc; }
+      #bargraph td div#late {
+        background: orange; }
+      #bargraph td div#later {
+        background: orangered; }
+      #bargraph td div#quitelate {
+        background: red; }
+      #bargraph td div#verylate {
+        background: #990000; }
 
 #routeInfo {
   background: white;

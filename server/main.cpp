@@ -4,13 +4,19 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <cmath>
 #include <sqlite3.h>
 
 #include "gtfs-realtime.pb.h"
 #include "gtfs-network.pb.h"
 
+std::vector<std::vector<double> > flatten (std::vector<std::vector<double> >& pts, double center[2]);
+bool inpoly (double pt[2], std::vector<std::vector<double> >& shape);
+
 int main (int argc, char* argv[]) {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+    system("./before");
 
     transit_realtime::FeedMessage feed_tu;
     transit_realtime::FeedMessage feed_vp;
@@ -59,7 +65,7 @@ int main (int argc, char* argv[]) {
     }
 
     // now go through delays and modify or append
-    int[5] regions = {0};
+    int regions[5] = {0};
     for (auto& tu: feed_tu.entity ()) {
         if (tu.has_trip_update () &&
             tu.trip_update ().has_vehicle () &&
@@ -142,5 +148,47 @@ int main (int argc, char* argv[]) {
 	}
 	google::protobuf::ShutdownProtobufLibrary ();
 
+    system("./after");
+
     return 0;
+}
+
+
+std::vector<std::vector<double> > flatten (std::vector<std::vector<double> >& pts, double center[2]) {
+    std::vector<std::vector<double> > flat;
+    flat.reserve (pts.size ());
+    double phi0 = center[1], lam0 = center[0];
+
+    for (int i=0; i<pts.size (); i++) {
+        if (pts[i][0] == lam0 && pts[i][1] == phi0) {
+            flat.emplace_back (0.0, 0.0);
+        } else {
+            flat.emplace_back(
+                (pts[i][0] - lam0) * std::cos(phi0 * M_PI / 180),
+                (pts[i][1] - phi0)
+            );
+        }
+    }
+    return flat;
+}
+
+
+/** taken from https://github.com/substack/point-in-polygon */
+bool inpoly (double pt[2], std::vector<std::vector<double> >& shape) {
+    // poly is CENTERED on the point, so point always (0,0)
+    double x = 0.0, y = 0.0;
+
+    auto vs = flatten(shape, pt);
+
+    bool inside = false;
+    for (int i = 0, j = vs.size () - 1; i < vs.size (); j = i++) {
+        double xi = vs[i][0], yi = vs[i][1];
+        double xj = vs[j][0], yj = vs[j][1];
+
+        bool intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+
+    return inside;
 }

@@ -33,9 +33,25 @@
                     </div>
 
                     <div class="panel2">
-                        [[ graph shows day's trace of % on time ]]
-
                         <table class="table">
+                            <tr id="bargraph">
+                                <td><div id="earlier"></div></td>
+                                <td><div id="early"></div></td>
+                                <td><div id="ontime"></div></td>
+                                <td><div id="late"></div></td>
+                                <td><div id="later"></div></td>
+                                <td><div id="quitelate"></div></td>
+                                <td><div id="verylate"></div></td>
+                            </tr>
+                            <tr class="text-center">
+                                <td id="deltab0"></td>
+                                <td id="deltab1"></td>
+                                <td id="deltab2"></td>
+                                <td id="deltab3"></td>
+                                <td id="deltab4"></td>
+                                <td id="deltab5"></td>
+                                <td id="deltab6"></td>
+                            </tr>
                             <tr>
                                 <th>&gt 5min early</th>
                                 <th>1&ndash;5min early</th>
@@ -44,15 +60,6 @@
                                 <th>10&ndash;20min late</th>
                                 <th>20&ndash;30min late</th>
                                 <th>&gt;30min late</th>
-                            </tr>
-                            <tr>
-                                <td id="deltab0"></td>
-                                <td id="deltab1"></td>
-                                <td id="deltab2"></td>
-                                <td id="deltab3"></td>
-                                <td id="deltab4"></td>
-                                <td id="deltab5"></td>
-                                <td id="deltab6"></td>
                             </tr>
                         </table>
                     </div>
@@ -83,8 +90,8 @@
         $("#networkRegions").css('height',
             $($(".region-status")[0]).width());
         networkMap();
-        networkStatus();
-        networkRegions();
+        // networkStatus();
+        // networkRegions();
     </script>
   </body>
 </html>

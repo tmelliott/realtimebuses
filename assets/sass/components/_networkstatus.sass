@@ -30,7 +30,41 @@ section#networkStatus
         flex-basis: 0
         margin: $grid-gutter-width 0
 
+        table
+            table-layout: fixed
+            text-align: center
+
     .panel3
         font-size: 22px
         background: lightblue
         padding: $grid-gutter-width
+
+
+#bargraph
+    margin-top: 10px
+    td
+        height: 300px
+        position: relative
+
+        div
+            position: absolute
+            bottom: 0
+            left: 10px
+            right: 10px
+            height: 0%
+            background: green
+
+            transition: height 2s ease-in-out
+
+            &#earlier
+                background: #444444
+            &#early
+                background: #cccccc
+            &#late
+                background: orange
+            &#later
+                background: orangered
+            &#quitelate
+                background: red
+            &#verylate
+                background: #990000

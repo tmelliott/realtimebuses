@@ -29,43 +29,43 @@ function networkMap () {
     var pts;
 
     function loadData () {
-      protobuf.load("assets/protobuf/gtfs-realtime.proto", function(err, root) {
+      protobuf.load("server/proto/gtfs-network.proto", function(err, root) {
           if (err)
               throw err;
-          var f = root.lookupType("transit_realtime.FeedMessage");
+          var f = root.lookupType("transit_network.Feed");
 
           var xhr = new XMLHttpRequest();
-          var vp = "https://dl.dropboxusercontent.com/s/z1nqu2xu9nhfjbk/vehicle_locations.pb?dl=1";
+          var vp = "https://dl.dropboxusercontent.com/s/2pth0fbgb8meiip/networkstate.pb?dl=1";
           xhr.open("GET", vp, true);
           xhr.responseType = "arraybuffer";
           xhr.onload = function(evt) {
               var m = f.decode (new Uint8Array(xhr.response));
-              addPositions(m.entity);
+              addPositions(m);
+              setStatus(m);
           }
           xhr.send(null);
       });
     };
     function addPositions (feed) {
-    //   console.log(feed);
       var data = {
           "type": "FeatureCollection",
           "features": []
       };
-      for (var i=0; i<feed.length; i++) {
-        if (feed[i].vehicle) {
-          if (feed[i].vehicle.position) {
+      for (var i=0; i<feed.vehicles.length; i++) {
+        if (feed.vehicles[i]) {
+          if (feed.vehicles[i].pos) {
             data.features.push({
               "type": "Feature",
               "geometry": {
                 "type": "Point",
                 "coordinates": [
-                  feed[i].vehicle.position.longitude,
-                  feed[i].vehicle.position.latitude
+                  feed.vehicles[i].pos.lng,
+                  feed.vehicles[i].pos.lat
                 ]
               },
               "properties": {
-                "delay": 0,
-                "delaytype": "arrival"
+                "delay": (feed.vehicles[i].delay ? feed.vehicles[i].delay : 0),
+                "delaytype": (feed.vehicles[i].delay ? (feed.vehicles[i].type == 0 ? "arrival" : "departure") : "")
               }
             });
           }
@@ -77,8 +77,10 @@ function networkMap () {
       pts = L.geoJSON(data, {
           pointToLayer: function(feature, latlng) {
               return L.circleMarker(latlng, {
-                  radius: 2,
-                  fillColor: "#990000",
+                  radius: 4,
+                  fillColor: (feature.properties.delay < -60 ? "gray" :
+                        (feature.properties.delay < 5*60 ? "green" :
+                    (feature.properties.delay < 10*60 ? "orange" : "red"))),
                   weight: 0,
                   fillOpacity: 0.8
               });
@@ -86,28 +88,14 @@ function networkMap () {
       }).addTo(map);
     };
 
+    // networkRegions();
     loadData();
     setInterval(loadData, 10000);
 };
 
-function networkStatus () {
-    fetchNetworkData();
-    setInterval(fetchNetworkData, 10000);
-};
 
 function networkRegions () {
     getRegions();
-    // var regions = [
-    //     {"name": "West", "status": 82},
-    //     {"name": "North", "status": 78},
-    //     {"name": "Central", "status": 55},
-    //     // {"name": "Isthmus", "status": 61},
-    //     {"name": "South", "status": 55},
-    //     // {"name": "East", "status": 42},
-    //     {"name": "Waiheke", "status": 34},
-    // ];
-    // initRegions(regions);
-    // setInterval(setRegions, 10000, regions);
 };
 
 function initRegions () {
@@ -170,57 +158,75 @@ function fetchNetworkData () {
     });
 };
 
-function setStatus (data) {
-    var ontime = 0, n = 0;
-    $(window.data.regions.features).each(function(key, val) {
-        val.properties.status = 0;
-        val.properties.ontime = 0;
-        val.properties.count = 0;
-    });
-    var tab = [0, 0, 0, 0, 0, 0, 0]; // [<-5, -5--1, -1-5, 5-10, 10-20, 20-30, 30+]
-    for (i=0; i<data.length; i++) {
-        if (data[i].tripUpdate) {
-            var stu = data[i].tripUpdate.stopTimeUpdate[0];
-            var del;
-            if (stu.arrival) {
-                del = stu.arrival.delay;
-            } else if (stu.departure) {
-                del = stu.departure.delay;
-            }
-            n++;
-            if (del > -60 && del < 60*5) ontime++;
-
-            if (del < -5*60) tab[0]++
-            else if (del < -60) tab[1]++;
-            else if (del < 60*5) tab[2]++;
-            else if (del < 60*10) tab[3]++;
-            else if (del < 60*20) tab[4]++;
-            else if (del < 60*30) tab[5]++;
-            else tab[6]++;
-
-            // now find stop and add to that region ...
-            if (window.data.stops != null) {
-                var stureg = window.data.stops.features.filter(function(s) {
-                    return s.properties.stop_id == stu.stopId;
-                })[0].properties.region;
-                for (var j=0;j<window.data.regions.features.length;j++) {
-                    if (stureg == window.data.regions.features[j].properties.name) {
-                        window.data.regions.features[j].properties.count += 1;
-                        if (del > -60 && del < 60*5)
-                            window.data.regions.features[j].properties.ontime += 1;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    // console.log(data);
-    $("#nwPerc").html(Math.round(ontime/n*100));
+function setStatus (feed) {
+    // $(window.data.regions.features).each(function(key, val) {
+    //     val.properties.status = 0;
+    //     val.properties.ontime = 0;
+    //     val.properties.count = 0;
+    // });
+    var nw = feed.status;
+    var tab = [nw.earlier, nw.early, nw.ontime,
+               nw.late, nw.later, nw.quitelate, nw.verylate];
+    function add (a, b) { return a + b; };
+    var n = tab.reduce (add, 0);
+    $("#nwPerc").html(Math.round(nw.ontime/n*100));
     for (i=0;i<tab.length; i++) {
         $("#deltab" + i).html(tab[i]);
     }
-    if (window.data.stops != null) setRegions();
-};
+    $("#bargraph #earlier").height(nw.earlier / n * 100 + "%");
+    $("#bargraph #early").height(nw.early / n * 100 + "%");
+    $("#bargraph #ontime").height(nw.ontime / n * 100 + "%");
+    $("#bargraph #late").height(nw.late / n * 100 + "%");
+    $("#bargraph #later").height(nw.later / n * 100 + "%");
+    $("#bargraph #quitelate").height(nw.quitelate / n * 100 + "%");
+    $("#bargraph #verylate").height(nw.verylate / n * 100 + "%");
+}
+
+// function old (data) {
+//     var tab = [0, 0, 0, 0, 0, 0, 0]; // [<-5, -5--1, -1-5, 5-10, 10-20, 20-30, 30+]
+//     for (i=0; i<data.length; i++) {
+//         if (data[i].tripUpdate) {
+//             var stu = data[i].tripUpdate.stopTimeUpdate[0];
+//             var del;
+//             if (stu.arrival) {
+//                 del = stu.arrival.delay;
+//             } else if (stu.departure) {
+//                 del = stu.departure.delay;
+//             }
+//             n++;
+//             if (del > -60 && del < 60*5) ontime++;
+//
+//             if (del < -5*60) tab[0]++
+//             else if (del < -60) tab[1]++;
+//             else if (del < 60*5) tab[2]++;
+//             else if (del < 60*10) tab[3]++;
+//             else if (del < 60*20) tab[4]++;
+//             else if (del < 60*30) tab[5]++;
+//             else tab[6]++;
+//
+//             // now find stop and add to that region ...
+//             if (window.data.stops != null) {
+//                 var stureg = window.data.stops.features.filter(function(s) {
+//                     return s.properties.stop_id == stu.stopId;
+//                 })[0].properties.region;
+//                 for (var j=0;j<window.data.regions.features.length;j++) {
+//                     if (stureg == window.data.regions.features[j].properties.name) {
+//                         window.data.regions.features[j].properties.count += 1;
+//                         if (del > -60 && del < 60*5)
+//                             window.data.regions.features[j].properties.ontime += 1;
+//                         break;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     // console.log(data);
+//     $("#nwPerc").html(Math.round(ontime/n*100));
+//     for (i=0;i<tab.length; i++) {
+//         $("#deltab" + i).html(tab[i]);
+//     }
+//     if (window.data.stops != null) setRegions();
+// };
 
 
 function projectPoint(x, y) {
