@@ -45,3 +45,4 @@ sync
 Makefile
 
 server/build
+data/*.pb
