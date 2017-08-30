@@ -15,15 +15,17 @@ function networkMap () {
         zoom = 11;
     }
     map = new L.Map("map", {
-        center: [-36.845794, 174.764378],
+        center: [-36.845794, 174.964378],
         zoom: zoom,
-        zoomControl: false
+        zoomControl: false,
+        attributionControl: false
     });
     L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
+    L.control.attribution({position: 'bottomleft'}).addTo(map);
 
 
     var pts;
@@ -78,9 +80,9 @@ function networkMap () {
           pointToLayer: function(feature, latlng) {
               return L.circleMarker(latlng, {
                   radius: 4,
-                  fillColor: (feature.properties.delay < -60 ? "gray" :
-                        (feature.properties.delay < 5*60 ? "green" :
-                    (feature.properties.delay < 10*60 ? "orange" : "red"))),
+                  fillColor: (feature.properties.delay < -60 ? "#ecf0f1" :
+                        (feature.properties.delay < 5*60 ? "#26d926" :
+                    (feature.properties.delay < 10*60 ? "#f39c12" : "#d35400"))),
                   weight: 0,
                   fillOpacity: 0.8
               });
