@@ -193,7 +193,7 @@ int main (int argc, char* argv[]) {
 
     transit_network::State* s = network.add_history ();
     s->set_timestamp (curtime);
-    s->set_percent (round (nw->ontime () / network.vehicles_size () * 100));
+    s->set_percent (round (100 * nw->ontime () / network.vehicles_size ()));
 
 	std::fstream output ("../../data/networkstate.pb",
 						 std::ios::out | std::ios::trunc | std::ios::binary);
