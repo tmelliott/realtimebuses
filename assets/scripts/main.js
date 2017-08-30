@@ -80,9 +80,15 @@ function networkMap () {
           pointToLayer: function(feature, latlng) {
               return L.circleMarker(latlng, {
                   radius: 4,
-                  fillColor: (feature.properties.delay < -60 ? "#ecf0f1" :
-                        (feature.properties.delay < 5*60 ? "#26d926" :
-                    (feature.properties.delay < 10*60 ? "#f39c12" : "#d35400"))),
+                  fillColor:
+                        (!feature.properties.delay ? "#95a5a6" :
+                        (feature.properties.delay < -5*60 ? "#1d07d0" :
+                        (feature.properties.delay <   -60 ? "#28aebb" :
+                        (feature.properties.delay <  5*60 ? "#26d926" :
+                        (feature.properties.delay < 10*60 ? "#f39c12" :
+                        (feature.properties.delay < 20*60 ? "#d35400" :
+                        (feature.properties.delay < 30*60 ? "red" :
+                         "#990000" ))))))),
                   weight: 0,
                   fillOpacity: 0.8
               });
@@ -168,7 +174,8 @@ function setStatus (feed) {
     // });
     var nw = feed.status;
     var tab = [nw.earlier, nw.early, nw.ontime,
-               nw.late, nw.later, nw.quitelate, nw.verylate];
+               nw.late, nw.later, nw.quitelate, nw.verylate,
+               nw.missing];
     function add (a, b) { return a + b; };
     var n = tab.reduce (add, 0);
     $("#nwPerc").html(Math.round(nw.ontime/n*100));
@@ -184,6 +191,7 @@ function setStatus (feed) {
     $("#bargraph #later").height(nw.later / nmax * 80 + "%");
     $("#bargraph #quitelate").height(nw.quitelate / nmax * 80 + "%");
     $("#bargraph #verylate").height(nw.verylate / nmax * 80 + "%");
+    $("#bargraph #nodata").height(nw.missing / nmax * 80 + "%");
 }
 
 // function old (data) {

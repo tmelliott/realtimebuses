@@ -10,6 +10,9 @@ message Feed {
 
     // vehicle locations + delays
 	repeated Vehicle vehicles = 2;
+
+    // history of network state
+    repeated State history = 3;
 }
 
 message Status {
@@ -52,4 +55,9 @@ message Vehicle {
 message Position {
 	required double lat = 1;
 	required double lng = 2;
+}
+
+message State {
+    required uint64 timestamp = 1;
+    required int32 percent = 2;
 }

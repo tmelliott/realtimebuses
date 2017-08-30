@@ -47,6 +47,7 @@ int main (int argc, char* argv[]) {
     }
     // We're all good!
 
+    time_t curtime = time (NULL);
     transit_network::Feed network;
     {
         transit_network::Feed network_old;
@@ -59,8 +60,7 @@ int main (int argc, char* argv[]) {
             // std::cerr << "failed to parse GTFS realtime feed!\n";
         } else {
             // only keep vehicles updated with 5 minutes
-            time_t curtime = time (NULL);
-            for (auto vo: network.vehicles ()) {
+            for (auto vo: network_old.vehicles ()) {
                 if (vo.timestamp () - curtime < 5*60) {
                     transit_network::Vehicle* v = network.add_vehicles ();
                     v->CopyFrom (vo);
@@ -68,6 +68,10 @@ int main (int argc, char* argv[]) {
             }
 
             // get state history
+            for (auto so: network_old.history ()) {
+                transit_network::State* s = network.add_history ();
+                s->CopyFrom (so);
+            }
         }
     }
 
@@ -186,6 +190,10 @@ int main (int argc, char* argv[]) {
     nw->set_quitelate (tbl[5]);
     nw->set_verylate (tbl[6]);
     nw->set_missing (tbl[7]);
+
+    transit_network::State* s = network.add_history ();
+    s->set_timestamp (curtime);
+    s->set_percent (round (nw->ontime () / network.vehicles_size () * 100));
 
 	std::fstream output ("../../data/networkstate.pb",
 						 std::ios::out | std::ios::trunc | std::ios::binary);
