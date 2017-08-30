@@ -1,0 +1,53 @@
+// All the data for the display
+
+syntax = "proto2";
+
+package transit_network;
+
+message Feed {
+    // the state of the entire network
+    required Status status = 1;
+
+    // vehicle locations + delays
+	repeated Vehicle vehicles = 2;
+}
+
+message Status {
+    // > 5min early
+    optional int32 earlier = 1;
+    // 1-5min early
+    optional int32 early = 2;
+    // 1min early - 5min late
+    optional int32 ontime = 3;
+    // 5-10 min late
+    optional int32 late = 4;
+    // 10-20 min late
+    optional int32 later = 5;
+    // 20-30 min late
+    optional int32 quitelate = 6;
+    // 30+ min late
+    optional int32 verylate = 7;
+    // no delay info
+    optional int32 missing = 8;
+}
+
+message Vehicle {
+    enum DelayType {
+        ARRIVAL = 0;
+        DEPARTURE = 1;
+    }
+
+    // vehicle ID for referencing it
+    required string id = 1;
+    // position of vehicle
+    optional Position pos = 2;
+    // current delay
+    optional int32 delay = 3;
+    // delay type
+    optional DelayType type = 4;
+}
+
+message Position {
+	required double lat = 1;
+	required double lng = 2;
+}
