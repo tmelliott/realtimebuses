@@ -45,6 +45,8 @@ message Vehicle {
     optional int32 delay = 3;
     // delay type
     optional DelayType type = 4;
+    // timestamp
+    required uint64 timestamp = 5;
 }
 
 message Position {

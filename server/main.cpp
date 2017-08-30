@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <string>
 #include <cmath>
+#include <time.h>
 #include <sqlite3.h>
 
 #include "gtfs-realtime.pb.h"
@@ -47,6 +48,28 @@ int main (int argc, char* argv[]) {
     // We're all good!
 
     transit_network::Feed network;
+    {
+        transit_network::Feed network_old;
+        std::string feed_file ("../../data/networkstate.pb");
+        std::fstream feed_in (feed_file, std::ios::in | std::ios::binary);
+        if (!feed_in) {
+            // no file... we'll just create a new one!
+            // std::cerr << "file not found!\n";
+        } else if (!network_old.ParseFromIstream (&feed_in)) {
+            // std::cerr << "failed to parse GTFS realtime feed!\n";
+        } else {
+            // only keep vehicles updated with 5 minutes
+            time_t curtime = time (NULL);
+            for (auto vo: network.vehicles ()) {
+                if (vo.timestamp () - curtime < 5*60) {
+                    transit_network::Vehicle* v = network.add_vehicles ();
+                    v->CopyFrom (vo);
+                }
+            }
+
+            // get state history
+        }
+    }
 
     // first add all the positions:
     for (auto& vp: feed_vp.entity ()) {
@@ -55,8 +78,28 @@ int main (int argc, char* argv[]) {
             vp.vehicle ().vehicle ().has_id () &&
             vp.vehicle ().has_position ()) {
 
-            transit_network::Vehicle* v = network.add_vehicles ();
-            v->set_id (vp.vehicle ().vehicle ().id ());
+            std::string vid (vp.vehicle ().vehicle ().id ());
+            int vi;
+            bool matched = false;
+            for (int i=0; i<network.vehicles_size (); i++) {
+                if (vid == network.vehicles (i).id ()) {
+                    matched = true;
+                    vi = i;
+                    break;
+                }
+            }
+
+            transit_network::Vehicle* v;
+            if (matched) {
+                v = network.mutable_vehicles (vi);
+            } else {
+                v = network.add_vehicles ();
+                v->set_id (vid);
+            }
+            v->set_timestamp (vp.vehicle ().timestamp ());
+
+            // transit_network::Vehicle* v = network.add_vehicles ();
+            // v->set_id (vp.vehicle ().vehicle ().id ());
             transit_network::Position* p = v->mutable_pos ();
             p->set_lat (vp.vehicle ().position ().latitude ());
             p->set_lng (vp.vehicle ().position ().longitude ());
@@ -89,6 +132,7 @@ int main (int argc, char* argv[]) {
             } else {
                 v = network.add_vehicles ();
                 v->set_id (vid);
+                v->set_timestamp (tu.trip_update ().timestamp ());
             }
 
             if (tu.trip_update ().stop_time_update (0).has_arrival () &&
@@ -106,10 +150,12 @@ int main (int argc, char* argv[]) {
     }
 
 
+
     transit_network::Status* nw = network.mutable_status ();
     // std::cout << "Processing " << network.vehicles_size () << " buses:";
 
     int tbl[8] = {0};
+
     for (auto& v: network.vehicles ()) {
         if (v.has_delay ()) {
             if (v.delay () < -5*60) {
@@ -149,6 +195,8 @@ int main (int argc, char* argv[]) {
 	google::protobuf::ShutdownProtobufLibrary ();
 
     system("./after");
+
+    std::cout << "done.\n";
 
     return 0;
 }
