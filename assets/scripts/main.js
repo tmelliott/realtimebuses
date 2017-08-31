@@ -54,6 +54,7 @@ function networkMap () {
           xhr.responseType = "arraybuffer";
           xhr.onload = function(evt) {
               var m = f.decode (new Uint8Array(xhr.response));
+              window.FEED = m;
               addPositions(m);
               setStatus(m);
               setTrace(m);

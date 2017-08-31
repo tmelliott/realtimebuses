@@ -191,8 +191,8 @@ int main () {
     nw->set_quitelate (tbl[5]);
     nw->set_verylate (tbl[6]);
     nw->set_missing (tbl[7]);
-    int N = network.history_size () - tbl[7];
 
+    int N = network.vehicles_size () - tbl[7];
     transit_network::State* s = network.add_history ();
     s->set_timestamp (curtime);
     s->set_percent (round (100 * nw->ontime () / N));
@@ -202,12 +202,12 @@ int main () {
     // smoothed history
     std::vector<uint64_t> Zt;
     std::vector<int> Zx;
-    for (int i=0; i<N; i++) {
+    for (unsigned i=0; i<network.history_size (); i++) {
         Zt.emplace_back (network.history (i).timestamp ());
         Zx.emplace_back (network.history (i).percent ());
     }
     std::vector<double> smoothed = smooth (Zt, Zx);
-    for (int i=0; i<N; i++) {
+    for (unsigned i=0; i<network.history_size (); i++) {
         transit_network::State* s = network.add_trace ();
         s->set_timestamp (Zt[i]);
         s->set_percent (smoothed[i]);
