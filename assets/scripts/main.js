@@ -85,9 +85,7 @@ function networkMap () {
             });
           }
         }
-        // console.log(feed[i]);
       }
-    //   console.log(data);
       if (pts != undefined) pts.clearLayers();
       pts = L.geoJSON(data, {
           pointToLayer: function(feature, latlng) {
@@ -160,25 +158,6 @@ function setRegions() {
     }
 };
 
-// function fetchNetworkData () {
-//     protobuf.load("assets/protobuf/gtfs-realtime.proto", function(err, root) {
-//         if (err)
-//             throw err;
-//         var f = root.lookupType("transit_realtime.FeedMessage");
-//
-//         var xhr = new XMLHttpRequest();
-//
-//         var tu = "https://dl.dropboxusercontent.com/s/4dodhqmz8vsi9vx/trip_updates.pb?dl=1";
-//         xhr.open("GET", tu, true);
-//         xhr.responseType = "arraybuffer";
-//         xhr.onload = function(evt) {
-//             var m = f.decode (new Uint8Array(xhr.response));
-//             setStatus(m.entity);
-//         }
-//         xhr.send(null);
-//     });
-// };
-
 function setStatus (feed) {
     // $(window.data.regions.features).each(function(key, val) {
     //     val.properties.status = 0;
@@ -189,8 +168,8 @@ function setStatus (feed) {
     var tab = [nw.earlier, nw.early, nw.ontime,
                nw.late, nw.later, nw.quitelate, nw.verylate,
                nw.missing];
-    function add (a, b) { return a + b; };
-    var n = tab.reduce (add, 0);
+    var n = 0;
+    for (var i=0; i<7; i++) n += tab[i];
     $("#nwPerc").html(Math.round(nw.ontime/n*100));
     var nmax = 0;
     for (i=0;i<tab.length; i++) {

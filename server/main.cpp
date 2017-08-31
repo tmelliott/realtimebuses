@@ -15,7 +15,7 @@ std::vector<std::vector<double> > flatten (std::vector<std::vector<double> >& pt
 bool inpoly (double pt[2], std::vector<std::vector<double> >& shape);
 std::vector<double> smooth (std::vector<uint64_t> t, std::vector<int> x);
 
-int main (int argc, char* argv[]) {
+int main () {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     system("./before");
@@ -191,13 +191,15 @@ int main (int argc, char* argv[]) {
     nw->set_quitelate (tbl[5]);
     nw->set_verylate (tbl[6]);
     nw->set_missing (tbl[7]);
+    int N = network.history_size () - tbl[7];
 
     transit_network::State* s = network.add_history ();
     s->set_timestamp (curtime);
-    s->set_percent (round (100 * nw->ontime () / network.vehicles_size ()));
+    s->set_percent (round (100 * nw->ontime () / N));
+    s->set_early (round (100 * (tbl[0] + tbl[1]) / N));
+    s->set_late (round (100 * (tbl[3] + tbl[4] + tbl[5] + tbl[6]) / N));
 
     // smoothed history
-    int N = network.history_size ();
     std::vector<uint64_t> Zt;
     std::vector<int> Zx;
     for (int i=0; i<N; i++) {
@@ -232,7 +234,7 @@ std::vector<std::vector<double> > flatten (std::vector<std::vector<double> >& pt
     flat.reserve (pts.size ());
     double phi0 = center[1], lam0 = center[0];
 
-    for (int i=0; i<pts.size (); i++) {
+    for (unsigned i=0; i<pts.size (); i++) {
         if (pts[i][0] == lam0 && pts[i][1] == phi0) {
             flat.emplace_back (0.0, 0.0);
         } else {
@@ -254,7 +256,7 @@ bool inpoly (double pt[2], std::vector<std::vector<double> >& shape) {
     auto vs = flatten(shape, pt);
 
     bool inside = false;
-    for (int i = 0, j = vs.size () - 1; i < vs.size (); j = i++) {
+    for (unsigned i = 0, j = vs.size () - 1; i < vs.size (); j = i++) {
         double xi = vs[i][0], yi = vs[i][1];
         double xj = vs[j][0], yj = vs[j][1];
 
@@ -273,16 +275,16 @@ std::vector<double> smooth (std::vector<uint64_t> t, std::vector<int> x) {
     z.reserve (x.size ());
 
     double f = 7.5*60;
-    for (int i=0; i<x.size (); i++) {
+    for (unsigned i=0; i<x.size (); i++) {
         std::vector<double> wt;
         wt.reserve (x.size ());
         double wtsum = 0.0;
-        for (int j=0; j<x.size (); j++) {
+        for (unsigned j=0; j<x.size (); j++) {
             wt.emplace_back (exp(-pow(t[j] - t[i], 2) / (2 * pow(f, 2))));
             wtsum += wt.back ();
         }
         double xbar = 0.0;
-        for (int j=0; j<x.size (); j++) xbar += x[j] * wt[j] / wtsum;
+        for (unsigned j=0; j<x.size (); j++) xbar += x[j] * wt[j] / wtsum;
         z.emplace_back(xbar);
     }
 
