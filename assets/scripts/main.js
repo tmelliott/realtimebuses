@@ -168,8 +168,8 @@ function setStatus (feed) {
     var tab = [nw.earlier, nw.early, nw.ontime,
                nw.late, nw.later, nw.quitelate, nw.verylate,
                nw.missing];
-    var n = 0;
-    for (var i=0; i<7; i++) n += tab[i];
+    function add (a, b) { return a + b; };
+    var n = tab.reduce (add, 0) - tab[7];
     $("#nwPerc").html(Math.round(nw.ontime/n*100));
     var nmax = 0;
     for (i=0;i<tab.length; i++) {
