@@ -10585,7 +10585,7 @@ section#networkStatus {
       #bargraph td div#nodata {
         background: #95a5a6; }
       #bargraph td div#earlier {
-        background: #1d07d0; }
+        background: #3c42a5; }
       #bargraph td div#early {
         background: #28aebb; }
       #bargraph td div#late {
@@ -10601,14 +10601,14 @@ section#networkStatus {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100px;
+  width: 600px;
   z-index: 1000;
   -webkit-transform: translateX(-100%);
           transform: translateX(-100%); }
   #historytrace .traceline {
     fill: none;
     stroke: orangered;
-    stroke-width: 1;
+    stroke-width: 3;
     opacity: 1; }
 
 #routeInfo {

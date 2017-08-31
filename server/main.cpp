@@ -272,7 +272,7 @@ std::vector<double> smooth (std::vector<uint64_t> t, std::vector<int> x) {
     std::vector<double> z;
     z.reserve (x.size ());
 
-    double f = 2.5*60;
+    double f = 7.5*60;
     for (int i=0; i<x.size (); i++) {
         std::vector<double> wt;
         wt.reserve (x.size ());
@@ -281,7 +281,7 @@ std::vector<double> smooth (std::vector<uint64_t> t, std::vector<int> x) {
             wt.emplace_back (exp(-pow(t[j] - t[i], 2) / (2 * pow(f, 2))));
             wtsum += wt.back ();
         }
-        double xbar = 0;
+        double xbar = 0.0;
         for (int j=0; j<x.size (); j++) xbar += x[j] * wt[j] / wtsum;
         z.emplace_back(xbar);
     }

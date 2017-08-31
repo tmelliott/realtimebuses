@@ -95,7 +95,7 @@ function networkMap () {
                   radius: 4,
                   fillColor:
                         (!feature.properties.delay ? "#95a5a6" :
-                        (feature.properties.delay < -5*60 ? "#1d07d0" :
+                        (feature.properties.delay < -5*60 ? "#3c42a5" :
                         (feature.properties.delay <   -60 ? "#28aebb" :
                         (feature.properties.delay <  5*60 ? "#26d926" :
                         (feature.properties.delay < 10*60 ? "#f39c12" :
@@ -232,7 +232,7 @@ function setTrace (feed) {
     // set the history trace (d3?)
     // console.log(feed.history);
     var traceline = d3.select(".traceline")
-        .attr("d", window.data.trace.lineGen(feed.history));
+        .attr("d", window.data.trace.lineGen(feed.trace));
 }
 
 // function old (data) {
