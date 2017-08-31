@@ -201,16 +201,22 @@ int main () {
 
     // smoothed history
     std::vector<uint64_t> Zt;
-    std::vector<int> Zx;
+    std::vector<int> Zx, Zx2, Zx3;
     for (int i=0; i<network.history_size (); i++) {
         Zt.emplace_back (network.history (i).timestamp ());
         Zx.emplace_back (network.history (i).percent ());
+        Zx2.emplace_back (network.history (i).early ());
+        Zx3.emplace_back (network.history (i).late ());
     }
     std::vector<double> smoothed = smooth (Zt, Zx);
+    std::vector<double> smoothed2 = smooth (Zt, Zx2);
+    std::vector<double> smoothed3 = smooth (Zt, Zx3);
     for (int i=0; i<network.history_size (); i++) {
         transit_network::State* s = network.add_trace ();
         s->set_timestamp (Zt[i]);
         s->set_percent (smoothed[i]);
+        s->set_early (smoothed2[i]);
+        s->set_late (smoothed3[i]);
     }
 
 
