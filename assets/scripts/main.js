@@ -29,6 +29,18 @@ function networkMap () {
 
 
     var pts;
+    var tpos = $(".panel1").offset(),
+        tht = $(".panel1").outerHeight();
+    $("#historytrace").css({
+        'height': tht,
+        'top': tpos.top,
+        'left': tpos.left
+    });
+    window.data.trace = {};
+    window.data.trace.svg = d3.select("#historytrace");
+    window.data.trace.g = window.data.trace.svg.append("g");
+    setupSVG();
+
 
     function loadData () {
       protobuf.load("server/proto/gtfs-network.proto", function(err, root) {
@@ -44,6 +56,7 @@ function networkMap () {
               var m = f.decode (new Uint8Array(xhr.response));
               addPositions(m);
               setStatus(m);
+              setTrace(m);
           }
           xhr.send(null);
       });
@@ -147,24 +160,24 @@ function setRegions() {
     }
 };
 
-function fetchNetworkData () {
-    protobuf.load("assets/protobuf/gtfs-realtime.proto", function(err, root) {
-        if (err)
-            throw err;
-        var f = root.lookupType("transit_realtime.FeedMessage");
-
-        var xhr = new XMLHttpRequest();
-
-        var tu = "https://dl.dropboxusercontent.com/s/4dodhqmz8vsi9vx/trip_updates.pb?dl=1";
-        xhr.open("GET", tu, true);
-        xhr.responseType = "arraybuffer";
-        xhr.onload = function(evt) {
-            var m = f.decode (new Uint8Array(xhr.response));
-            setStatus(m.entity);
-        }
-        xhr.send(null);
-    });
-};
+// function fetchNetworkData () {
+//     protobuf.load("assets/protobuf/gtfs-realtime.proto", function(err, root) {
+//         if (err)
+//             throw err;
+//         var f = root.lookupType("transit_realtime.FeedMessage");
+//
+//         var xhr = new XMLHttpRequest();
+//
+//         var tu = "https://dl.dropboxusercontent.com/s/4dodhqmz8vsi9vx/trip_updates.pb?dl=1";
+//         xhr.open("GET", tu, true);
+//         xhr.responseType = "arraybuffer";
+//         xhr.onload = function(evt) {
+//             var m = f.decode (new Uint8Array(xhr.response));
+//             setStatus(m.entity);
+//         }
+//         xhr.send(null);
+//     });
+// };
 
 function setStatus (feed) {
     // $(window.data.regions.features).each(function(key, val) {
@@ -192,6 +205,34 @@ function setStatus (feed) {
     $("#bargraph #quitelate").height(nw.quitelate / nmax * 80 + "%");
     $("#bargraph #verylate").height(nw.verylate / nmax * 80 + "%");
     $("#bargraph #nodata").height(nw.missing / nmax * 80 + "%");
+}
+
+function setupSVG () {
+    var xscale = d3.scaleLinear()
+        // up to 24 hours ago
+        .domain([24*60*60, 0])
+        .range([0, $("#historytrace").outerWidth()]);
+    var yxcale = d3.scaleLinear()
+        .domain([0, 100])
+        .range([$("#historytrace").outerHeight(), 0]);
+
+    // axis here
+
+    window.data.trace.g.append("g")
+        // .attr("class", "percentontime")
+        .append("path")
+            .attr("class", "traceline");
+    window.data.trace.lineGen = d3.line()
+        // .defined(function(d) {return !isNaN(d.percent); })
+        .x(function(d) { return xscale(new Date().getTime()/1000 - d.timestamp); })
+        .y(function(d) { return yxcale(d.percent); })
+        .curve(d3.curveBasisOpen);
+}
+function setTrace (feed) {
+    // set the history trace (d3?)
+    // console.log(feed.history);
+    var traceline = d3.select(".traceline")
+        .attr("d", window.data.trace.lineGen(feed.history));
 }
 
 // function old (data) {

@@ -16,6 +16,7 @@ section#networkStatus
         background: orange
         padding: 2.5rem 1rem 1.85rem
         text-align: center
+        position: relative
 
         .nwstate
             padding-left: 20px
@@ -102,3 +103,17 @@ section#networkStatus
                 background: red
             &#verylate
                 background: #990000
+
+#historytrace
+    position: fixed
+    top: 0
+    left: 0
+    height: 100px
+    z-index: 1000
+    transform: translateX(-100%)
+
+    .traceline
+        fill: none
+        stroke: orangered
+        stroke-width: 1
+        opacity: 1

@@ -10521,7 +10521,8 @@ section#networkStatus {
   section#networkStatus .panel1 {
     background: orange;
     padding: 2.5rem 1rem 1.85rem;
-    text-align: center; }
+    text-align: center;
+    position: relative; }
     section#networkStatus .panel1 .nwstate {
       padding-left: 20px;
       font-size: 55px;
@@ -10595,6 +10596,20 @@ section#networkStatus {
         background: red; }
       #bargraph td div#verylate {
         background: #990000; }
+
+#historytrace {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100px;
+  z-index: 1000;
+  -webkit-transform: translateX(-100%);
+          transform: translateX(-100%); }
+  #historytrace .traceline {
+    fill: none;
+    stroke: orangered;
+    stroke-width: 1;
+    opacity: 1; }
 
 #routeInfo {
   background: white;
