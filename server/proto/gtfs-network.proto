@@ -13,6 +13,8 @@ message Feed {
 
     // history of network state
     repeated State history = 3;
+    // smoothed history
+    repeated State trace = 4;
 }
 
 message Status {

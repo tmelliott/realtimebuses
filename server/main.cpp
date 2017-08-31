@@ -13,6 +13,7 @@
 
 std::vector<std::vector<double> > flatten (std::vector<std::vector<double> >& pts, double center[2]);
 bool inpoly (double pt[2], std::vector<std::vector<double> >& shape);
+std::vector<double> smooth (std::vector<uint64_t> t, std::vector<int> x);
 
 int main (int argc, char* argv[]) {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -195,6 +196,22 @@ int main (int argc, char* argv[]) {
     s->set_timestamp (curtime);
     s->set_percent (round (100 * nw->ontime () / network.vehicles_size ()));
 
+    // smoothed history
+    int N = network.history_size ();
+    std::vector<uint64_t> Zt;
+    std::vector<int> Zx;
+    for (int i=0; i<N; i++) {
+        Zt.emplace_back (network.history (i).timestamp ());
+        Zx.emplace_back (network.history (i).percent ());
+    }
+    std::vector<double> smoothed = smooth (Zt, Zx);
+    for (int i=0; i<N; i++) {
+        transit_network::State* s = network.add_trace ();
+        s->set_timestamp (Zt[i]);
+        s->set_percent (smoothed[i]);
+    }
+
+
 	std::fstream output ("../../data/networkstate.pb",
 						 std::ios::out | std::ios::trunc | std::ios::binary);
 	if (!network.SerializeToOstream (&output)) {
@@ -247,4 +264,27 @@ bool inpoly (double pt[2], std::vector<std::vector<double> >& shape) {
     }
 
     return inside;
+}
+
+
+
+std::vector<double> smooth (std::vector<uint64_t> t, std::vector<int> x) {
+    std::vector<double> z;
+    z.reserve (x.size ());
+
+    double f = 2.5*60;
+    for (int i=0; i<x.size (); i++) {
+        std::vector<double> wt;
+        wt.reserve (x.size ());
+        double wtsum = 0.0;
+        for (int j=0; j<x.size (); j++) {
+            wt.emplace_back (exp(-pow(t[j] - t[i], 2) / (2 * pow(f, 2))));
+            wtsum += wt.back ();
+        }
+        double xbar = 0;
+        for (int j=0; j<x.size (); j++) xbar += x[j] * wt[j] / wtsum;
+        z.emplace_back(xbar);
+    }
+
+    return z;
 }
