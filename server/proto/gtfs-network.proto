@@ -61,7 +61,7 @@ message Position {
 
 message State {
     required uint64 timestamp = 1;
-    required int32 percent = 2;
-    optional int32 early = 3;
-    optional int32 late = 4;
+    required double percent = 2;
+    optional double early = 3;
+    optional double late = 4;
 }
