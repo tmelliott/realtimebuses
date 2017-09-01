@@ -43,7 +43,7 @@ section#networkStatus
         // background: black
         color: #eeeeee
         padding: $grid-gutter-width
-        flex-grow: 1
+        flex-grow: 0
         flex-basis: 0
         margin: $grid-gutter-width 0
 
@@ -68,6 +68,11 @@ section#networkStatus
 
         p
             margin: 1.5rem 0
+
+    .panel4
+        padding-bottom: 1.5rem 0
+        flex-grow: 1
+        flex-basis: 0
 
 
 #bargraph
@@ -105,17 +110,34 @@ section#networkStatus
                 background: #990000
 
 #historytrace
-    position: fixed
     // background: pink
-    top: 0
-    left: 0
-    // height: 100px
-    width: 600px
-    z-index: 1000
-    transform: translateX(-100%)
+    height: 200px
+    width: 100%
 
     .traceline
         fill: none
-        stroke: orangered
+        stroke: #26d926
         stroke-width: 3
         opacity: 1
+
+    .traceearly
+        stroke: #3c42a5
+
+    .tracelate
+        stroke: #d35400
+
+    .axis
+        stroke
+            stroke: white
+            stroke-width: 1
+        path
+            stroke: none
+        text
+            fill: white
+            font-size: 12px
+            font-weight: bold
+
+    .axis-left
+        transform: translateX(30px)
+    .axis-top
+        transform: translateY(20px)

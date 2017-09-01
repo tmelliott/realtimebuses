@@ -67,6 +67,11 @@
                         </table>
                     </div>
 
+                    <div class="panel4">
+                        <!-- <p><strong>Today's history:</strong></p> -->
+                        <svg id="historytrace"></svg>
+                    </div>
+
                     <div class="panel3">
                         <p>
                             <strong>The map shows real-time positions of buses in the Auckland Transport network</strong>. This data
@@ -74,8 +79,8 @@
                         </p>
 
                         <p>
-                            <strong>On-time is defined as between 1 minute early and 5 minutes late</strong>, which is the region colored in green in the histogram, and <em>excludes</em> buses with no arrival data
-                            (the grey No Data column).
+                            <strong>On-time is defined as between 1 minute early and 5 minutes late</strong> (green bar), and <em>excludes</em> buses with no arrival data
+                            (the grey No Data bar).
                             <!-- <strong>The breakdown by region</strong> is based on the location of the stop at which the delay was reported. -->
                         </p>
                     </div>
@@ -83,7 +88,7 @@
             </div>
         </div>
     </div>
-    <svg id="historytrace"></svg>
+
 
     <script src="https://unpkg.com/leaflet@1.1.0/dist/leaflet.js"
    integrity="sha512-mNqn2Wg7tSToJhvHcqfzLMU6J4mkOImSPTxVZAdo+lcPlk+GhZmYgACEe0x35K7YzW1zJ7XyJV/TT1MrdXvMcA=="

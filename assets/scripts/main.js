@@ -31,11 +31,6 @@ function networkMap () {
     var pts;
     var tpos = $(".panel1").offset(),
         tht = $(".panel1").outerHeight();
-    $("#historytrace").css({
-        'height': tht,
-        'top': tpos.top,
-        'left': tpos.left
-    });
     window.data.trace = {};
     window.data.trace.svg = d3.select("#historytrace");
     window.data.trace.g = window.data.trace.svg.append("g");
@@ -110,7 +105,7 @@ function networkMap () {
 
     // networkRegions();
     loadData();
-    setInterval(loadData, 10000);
+    setInterval(loadData, 30000);
 };
 
 
@@ -190,29 +185,66 @@ function setStatus (feed) {
 function setupSVG () {
     var xscale = d3.scaleLinear()
         // up to 24 hours ago
-        .domain([24*60*60, 0])
-        .range([0, $("#historytrace").outerWidth()]);
-    var yxcale = d3.scaleLinear()
+        // .domain([24*60*60, 0])
+        .domain([5, 24]) // from 5am - midnight
+        .range([40, $("#historytrace").outerWidth()-40]);
+    var yscale = d3.scaleLinear()
         .domain([0, 100])
-        .range([$("#historytrace").outerHeight(), 0]);
+        .range([$("#historytrace").outerHeight()-20, 40]);
 
     // axis here
+    window.data.trace.g.append("g")
+        .attr("class", "axis axis-left")
+        // .attr("transform", "translateX(20)")
+        .call(d3.axisLeft(yscale).ticks(6));
+    window.data.trace.g.append("g")
+        .attr("class", "axis axis-top")
+        .call(d3.axisTop(xscale)
+            .tickValues([6,9,12,15,18,21])
+            .tickFormat(function(h) {
+                if (h < 12) return h + "am";
+                if (h == 12) return "12noon";
+                return (h - 12) + "pm";
+            }));
 
     window.data.trace.g.append("g")
         // .attr("class", "percentontime")
         .append("path")
             .attr("class", "traceline");
+    window.data.trace.g.append("g")
+        .append("path")
+            .attr("class", "traceline traceearly");
+    window.data.trace.g.append("g")
+        .append("path")
+            .attr("class", "traceline tracelate");
+    var today = new Date();
+    var start = new Date(today.getFullYear() + "-" +
+        (today.getMonth()+1) + "-" + today.getDate()).getTime()/1000;
     window.data.trace.lineGen = d3.line()
         // .defined(function(d) {return !isNaN(d.percent); })
-        .x(function(d) { return xscale(new Date().getTime()/1000 - d.timestamp); })
-        .y(function(d) { return yxcale(d.percent); })
+        // .x(function(d) { return xscale(new Date().getTime()/1000 - d.timestamp); })
+        .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+        .y(function(d) { return yscale(d.percent); })
         .curve(d3.curveBasisOpen);
+    window.data.trace.lineGen2 = d3.line()
+        .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+        .y(function(d) { return yscale(d.early); })
+        .curve(d3.curveBasisOpen);
+    window.data.trace.lineGen3 = d3.line()
+        .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+        .y(function(d) { return yscale(d.late); })
+        .curve(d3.curveBasisOpen);
+
 }
 function setTrace (feed) {
     // set the history trace (d3?)
     // console.log(feed.history);
     var traceline = d3.select(".traceline")
         .attr("d", window.data.trace.lineGen(feed.trace));
+    var traceearly = d3.select(".traceearly")
+        .attr("d", window.data.trace.lineGen2(feed.trace));
+    var tracelate = d3.select(".tracelate")
+        .attr("d", window.data.trace.lineGen3(feed.trace));
 }
 
 // function old (data) {
