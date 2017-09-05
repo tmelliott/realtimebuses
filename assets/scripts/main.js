@@ -183,32 +183,37 @@ function setStatus (feed) {
 }
 
 function setupSVG () {
+    var ht = $("#historytrace").outerHeight(),
+        wd = $("#historytrace").outerWidth();
     var xscale = d3.scaleLinear()
         // up to 24 hours ago
         // .domain([24*60*60, 0])
         .domain([5, 24]) // from 5am - midnight
-        .range([40, $("#historytrace").outerWidth()-40]);
+        .range([40, wd-40]);
     var yscale = d3.scaleLinear()
         .domain([0, 100])
-        .range([$("#historytrace").outerHeight()-20, 40]);
+        .range([ht-40, 10]);
 
     // axis here
     window.data.trace.g.append("g")
         .attr("class", "axis axis-left")
-        // .attr("transform", "translateX(20)")
-        .call(d3.axisLeft(yscale).ticks(6));
+        .call(d3.axisLeft(yscale).ticks(6).tickSize(-(wd-40)));
     window.data.trace.g.append("g")
-        .attr("class", "axis axis-top")
-        .call(d3.axisTop(xscale)
+        .attr("style", "transform: translateY(" + (ht-30) + "px)")
+        .attr("class", "axis axis-bottom")
+        .call(d3.axisBottom(xscale)
             .tickValues([6,9,12,15,18,21])
+            .tickSize(-ht)
             .tickFormat(function(h) {
                 if (h < 12) return h + "am";
                 if (h == 12) return "12noon";
                 return (h - 12) + "pm";
             }));
 
+    // axis lines
+
+
     window.data.trace.g.append("g")
-        // .attr("class", "percentontime")
         .append("path")
             .attr("class", "traceline");
     // window.data.trace.g.append("g")

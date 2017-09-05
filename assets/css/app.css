@@ -10575,11 +10575,25 @@ section#networkStatus {
             flex-grow: 1;
     -ms-flex-preferred-size: 0;
         flex-basis: 0; }
+    section#networkStatus .panel4 p {
+      color: white; }
+      section#networkStatus .panel4 p span {
+        display: inline-block;
+        height: 3px;
+        -webkit-transform: translateY(-0.25em);
+                transform: translateY(-0.25em);
+        width: 40px;
+        margin: 0 2px 0 20px;
+        background: #26d926; }
+        section#networkStatus .panel4 p span.early {
+          background: #28aebb; }
+        section#networkStatus .panel4 p span.late {
+          background: #d35400; }
 
 #bargraph {
   margin-top: 10px; }
   #bargraph td {
-    height: 20vh;
+    height: 250px;
     position: relative; }
     #bargraph td div {
       position: absolute;
@@ -10629,6 +10643,9 @@ section#networkStatus {
     stroke-width: 1; }
   #historytrace .axis path {
     stroke: none; }
+  #historytrace .axis line {
+    stroke-width: 1;
+    stroke: rgba(255, 255, 255, 0.05); }
   #historytrace .axis text {
     fill: white;
     font-size: 12px;
@@ -10636,9 +10653,6 @@ section#networkStatus {
   #historytrace .axis-left {
     -webkit-transform: translateX(30px);
             transform: translateX(30px); }
-  #historytrace .axis-top {
-    -webkit-transform: translateY(20px);
-            transform: translateY(20px); }
 
 #routeInfo {
   background: white;

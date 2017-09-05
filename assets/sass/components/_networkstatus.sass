@@ -74,12 +74,26 @@ section#networkStatus
         flex-grow: 1
         flex-basis: 0
 
+        p
+            color: white
+            span
+                display: inline-block
+                height: 3px
+                transform: translateY(-0.25em)
+                width: 40px
+                margin: 0 2px 0 20px
+                background: #26d926
+
+                &.early
+                    background: #28aebb
+                &.late
+                    background: #d35400
 
 #bargraph
     margin-top: 10px
 
     td
-        height: 20vh
+        height: 250px
         position: relative
 
         div
@@ -139,6 +153,9 @@ section#networkStatus
             stroke-width: 1
         path
             stroke: none
+        line
+            stroke-width: 1
+            stroke: rgba(255,255,255,0.05)
         text
             fill: white
             font-size: 12px
@@ -146,5 +163,7 @@ section#networkStatus
 
     .axis-left
         transform: translateX(30px)
-    .axis-top
-        transform: translateY(20px)
+    // .axis-top
+    //     transform: translateY(20px)
+    // .axis-bottom
+    //     transform: translateY(100)
