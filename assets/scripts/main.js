@@ -211,30 +211,84 @@ function setupSVG () {
         // .attr("class", "percentontime")
         .append("path")
             .attr("class", "traceline");
+    // window.data.trace.g.append("g")
+    //     .append("path")
+    //         .attr("class", "traceline traceearlier");
     window.data.trace.g.append("g")
         .append("path")
             .attr("class", "traceline traceearly");
+    // window.data.trace.g.append("g")
+    //     .append("path")
+    //         .attr("class", "traceline tracelate");
     window.data.trace.g.append("g")
         .append("path")
-            .attr("class", "traceline tracelate");
+            .attr("class", "traceline tracelater");
+    // window.data.trace.g.append("g")
+    //     .append("path")
+    //         .attr("class", "traceline tracequitelate");
+    // window.data.trace.g.append("g")
+    //     .append("path")
+    //         .attr("class", "traceline traceverylate");
     var today = new Date();
     var start = new Date(today.getFullYear() + "-" +
         (today.getMonth()+1) + "-" + today.getDate()).getTime()/1000;
     window.data.trace.lineGen = d3.line()
-        .defined(function(d) {return !isNaN(d.ontime); })
+        .defined(function(d) {
+            return !isNaN(d.ontime);
+        })
         .x(function(d) { return xscale((d.timestamp - start)/60/60); })
         .y(function(d) { return yscale(d.ontime); })
         .curve(d3.curveBasisOpen);
-    window.data.trace.lineGen2 = d3.line()
-        .defined(function(d) {return !isNaN(d.early); })
-        .x(function(d) { return xscale((d.timestamp - start)/60/60); })
-        .y(function(d) { return yscale(d.early); })
-        .curve(d3.curveBasisOpen);
+    // window.data.trace.lineGen2 = d3.line()
+    //     .defined(function(d) {return !isNaN(d.earlier); })
+    //     .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+    //     .y(function(d) { return yscale(d.earlier); })
+    //     .curve(d3.curveBasisOpen);
     window.data.trace.lineGen3 = d3.line()
-        .defined(function(d) {return !isNaN(d.late); })
+        .defined(function(d) {return !isNaN(d.early) && !isNaN(d.earlier); })
         .x(function(d) { return xscale((d.timestamp - start)/60/60); })
-        .y(function(d) { return yscale(d.late); })
+        .y(function(d) { return yscale(d.early + d.earlier); })
         .curve(d3.curveBasisOpen);
+    // window.data.trace.lineGen4 = d3.line()
+    //     .defined(function(d) {
+    //         return !isNaN(d.late) && !isNaN(d.ontime) &&
+    //             !isNaN(d.early) && !isNaN(d.earlier);
+    //     })
+    //     .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+    //     .y(function(d) { return yscale(d.late + d.ontime + d.early + d.earlier); })
+    //     .curve(d3.curveBasisOpen);
+    window.data.trace.lineGen5 = d3.line()
+        .defined(function(d) {
+            return !isNaN(d.later) && !isNaN(d.late) &&
+                !isNaN(d.quitelate) && !isNaN(d.verylate);
+        })
+        .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+        .y(function(d) {
+            return yscale(d.late + d.later + d.quitelate + d.verylate);
+        })
+        .curve(d3.curveBasisOpen);
+    // window.data.trace.lineGen6 = d3.line()
+    //     .defined(function(d) {
+    //         return !isNaN(d.quitelate) && !isNaN(d.later) && !isNaN(d.late) &&
+    //             !isNaN(d.ontime) && !isNaN(d.early) && !isNaN(d.earlier);
+    //     })
+    //     .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+    //     .y(function(d) {
+    //         return yscale(d.quitelate + d.later + d.late +
+    //             d.ontime + d.early + d.earlier);
+    //     })
+    //     .curve(d3.curveBasisOpen);
+    // window.data.trace.lineGen7 = d3.line()
+    //     .defined(function(d) {
+    //         return !isNaN(d.verylate) && !isNaN(d.quitelate) && !isNaN(d.later) &&
+    //             !isNaN(d.late) && !isNaN(d.ontime) && !isNaN(d.early) && !isNaN(d.earlier);
+    //     })
+    //     .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+    //     .y(function(d) {
+    //         return yscale(d.verylate + d.quitelate + d.later + d.late +
+    //             d.ontime + d.early + d.earlier);
+    //     })
+    //     .curve(d3.curveBasisOpen);
 
 }
 function setTrace (feed) {
@@ -242,10 +296,18 @@ function setTrace (feed) {
     // console.log(feed.history);
     var traceline = d3.select(".traceline")
         .attr("d", window.data.trace.lineGen(feed.trace));
+    // var traceearlier = d3.select(".traceearlier")
+    //     .attr("d", window.data.trace.lineGen2(feed.trace));
     var traceearly = d3.select(".traceearly")
-        .attr("d", window.data.trace.lineGen2(feed.trace));
-    var tracelate = d3.select(".tracelate")
         .attr("d", window.data.trace.lineGen3(feed.trace));
+    // var tracelate = d3.select(".tracelate")
+    //     .attr("d", window.data.trace.lineGen4(feed.trace));
+    var tracelater = d3.select(".tracelater")
+        .attr("d", window.data.trace.lineGen5(feed.trace));
+    // var tracequitelate = d3.select(".tracequitelate")
+    //     .attr("d", window.data.trace.lineGen6(feed.trace));
+    // var traceverylate = d3.select(".traceverylate")
+    //     .attr("d", window.data.trace.lineGen7(feed.trace));
 }
 
 // function old (data) {
