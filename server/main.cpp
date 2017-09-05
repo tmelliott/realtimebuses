@@ -195,28 +195,44 @@ int main () {
     int N = network.vehicles_size () - tbl[7];
     transit_network::State* s = network.add_history ();
     s->set_timestamp (curtime);
-    s->set_percent (round (100 * nw->ontime () / N));
-    s->set_early (round (100 * (tbl[0] + tbl[1]) / N));
-    s->set_late (round (100 * (tbl[3] + tbl[4] + tbl[5] + tbl[6]) / N));
+    s->set_earlier (round (100 * tbl[0] / N));
+    s->set_early (round (100 * tbl[1] / N));
+    s->set_ontime (round (100 * tbl[2] / N));
+    s->set_late (round (100 * tbl[3] / N));
+    s->set_later (round (100 * tbl[4] / N));
+    s->set_quitelate (round (100 * tbl[5] / N));
+    s->set_verylate (round (100 * tbl[6] / N));
 
     // smoothed history
     std::vector<uint64_t> Zt;
-    std::vector<int> Zx, Zx2, Zx3;
+    std::vector<int> Zx, Zx2, Zx3, Zx4, Zx5, Zx6, Zx7;
     for (int i=0; i<network.history_size (); i++) {
         Zt.emplace_back (network.history (i).timestamp ());
-        Zx.emplace_back (network.history (i).percent ());
-        Zx2.emplace_back (network.history (i).early ());
-        Zx3.emplace_back (network.history (i).late ());
+        Zx.emplace_back (network.history (i).ontime ());
+        Zx2.emplace_back (network.history (i).earlier ());
+        Zx3.emplace_back (network.history (i).early ());
+        Zx4.emplace_back (network.history (i).late ());
+        Zx5.emplace_back (network.history (i).later ());
+        Zx6.emplace_back (network.history (i).quitelate ());
+        Zx7.emplace_back (network.history (i).verylate ());
     }
     std::vector<double> smoothed = smooth (Zt, Zx);
     std::vector<double> smoothed2 = smooth (Zt, Zx2);
     std::vector<double> smoothed3 = smooth (Zt, Zx3);
+    std::vector<double> smoothed4 = smooth (Zt, Zx4);
+    std::vector<double> smoothed5 = smooth (Zt, Zx5);
+    std::vector<double> smoothed6 = smooth (Zt, Zx6);
+    std::vector<double> smoothed7 = smooth (Zt, Zx7);
     for (int i=0; i<network.history_size (); i++) {
         transit_network::State* s = network.add_trace ();
         s->set_timestamp (Zt[i]);
-        s->set_percent (smoothed[i]);
-        s->set_early (smoothed2[i]);
-        s->set_late (smoothed3[i]);
+        s->set_earlier (smoothed2[i]);
+        s->set_early (smoothed3[i]);
+        s->set_ontime (smoothed[i]);
+        s->set_late (smoothed4[i]);
+        s->set_later (smoothed5[i]);
+        s->set_quitelate (smoothed6[i]);
+        s->set_verylate (smoothed7[i]);
     }
 
 

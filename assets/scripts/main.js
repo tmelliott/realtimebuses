@@ -221,16 +221,17 @@ function setupSVG () {
     var start = new Date(today.getFullYear() + "-" +
         (today.getMonth()+1) + "-" + today.getDate()).getTime()/1000;
     window.data.trace.lineGen = d3.line()
-        // .defined(function(d) {return !isNaN(d.percent); })
-        // .x(function(d) { return xscale(new Date().getTime()/1000 - d.timestamp); })
+        .defined(function(d) {return !isNaN(d.ontime); })
         .x(function(d) { return xscale((d.timestamp - start)/60/60); })
-        .y(function(d) { return yscale(d.percent); })
+        .y(function(d) { return yscale(d.ontime); })
         .curve(d3.curveBasisOpen);
     window.data.trace.lineGen2 = d3.line()
+        .defined(function(d) {return !isNaN(d.early); })
         .x(function(d) { return xscale((d.timestamp - start)/60/60); })
         .y(function(d) { return yscale(d.early); })
         .curve(d3.curveBasisOpen);
     window.data.trace.lineGen3 = d3.line()
+        .defined(function(d) {return !isNaN(d.late); })
         .x(function(d) { return xscale((d.timestamp - start)/60/60); })
         .y(function(d) { return yscale(d.late); })
         .curve(d3.curveBasisOpen);

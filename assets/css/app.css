@@ -10579,7 +10579,7 @@ section#networkStatus {
 #bargraph {
   margin-top: 10px; }
   #bargraph td {
-    height: 300px;
+    height: 20vh;
     position: relative; }
     #bargraph td div {
       position: absolute;
@@ -10613,9 +10613,17 @@ section#networkStatus {
     stroke-width: 3;
     opacity: 1; }
   #historytrace .traceearly {
+    stroke: #28aebb; }
+  #historytrace .traceearlier {
     stroke: #3c42a5; }
   #historytrace .tracelate {
+    stroke: #f39c12; }
+  #historytrace .tracelater {
     stroke: #d35400; }
+  #historytrace .tracequitelate {
+    stroke: red; }
+  #historytrace .traceverylate {
+    stroke: #990000; }
   #historytrace .axis stroke {
     stroke: white;
     stroke-width: 1; }
