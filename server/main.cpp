@@ -62,7 +62,8 @@ int main () {
         } else {
             // only keep vehicles updated with 5 minutes
             for (auto vo: network_old.vehicles ()) {
-                if (vo.timestamp () - curtime < 5*60) {
+		// if vehicle updated within 5mins, keep it:
+                if (curtime - vo.timestamp () > -5*60) {
                     transit_network::Vehicle* v = network.add_vehicles ();
                     v->CopyFrom (vo);
                 }
