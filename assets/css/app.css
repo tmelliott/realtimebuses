@@ -10514,9 +10514,6 @@ section#networkStatus {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
   padding: 0; }
   section#networkStatus .panel1 {
     background: orange;
@@ -10559,24 +10556,18 @@ section#networkStatus {
         border-color: rgba(255, 255, 255, 0.15);
         text-align: center;
         font-size: 14px; }
-  section#networkStatus .panel3 {
-    font-size: 2.25rem;
-    line-height: 1.5;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 1.5rem 2.5rem;
-    color: #fff;
-    border: 4px solid #fff; }
-    section#networkStatus .panel3 p {
-      margin: 1.5rem 0; }
   section#networkStatus .panel4 {
+    margin-top: 3rem;
     padding-bottom: 1.5rem 0;
-    -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
-            flex-grow: 1;
+    -webkit-box-flex: 0;
+        -ms-flex-positive: 0;
+            flex-grow: 0;
     -ms-flex-preferred-size: 0;
         flex-basis: 0; }
-    section#networkStatus .panel4 p {
+    section#networkStatus .panel4 p, section#networkStatus .panel4 h3, section#networkStatus .panel4 h4 {
       color: white; }
+    section#networkStatus .panel4 p {
+      text-align: right; }
       section#networkStatus .panel4 p span {
         display: inline-block;
         height: 3px;
@@ -10590,10 +10581,27 @@ section#networkStatus {
         section#networkStatus .panel4 p span.late {
           background: #d35400; }
 
+.panel3 {
+  font-size: 1.8rem;
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1.5rem 2.5rem;
+  color: #fff;
+  border: 4px solid #fff; }
+  .panel3 p {
+    margin: 1.5rem 0; }
+  @media (min-width: 992px) {
+    .panel3 {
+      position: fixed;
+      top: 1em;
+      left: 1em;
+      width: 30%;
+      z-index: 1000; } }
+
 #bargraph {
   margin-top: 10px; }
   #bargraph td {
-    height: 250px;
+    height: 300px;
     position: relative; }
     #bargraph td div {
       position: absolute;

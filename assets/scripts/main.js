@@ -15,7 +15,7 @@ function networkMap () {
         zoom = 11;
     }
     map = new L.Map("map", {
-        center: [-36.845794, 174.964378],
+        center: [-36.845794, 174.860478],
         zoom: zoom,
         zoomControl: false,
         attributionControl: false
