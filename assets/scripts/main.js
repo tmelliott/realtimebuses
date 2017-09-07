@@ -42,9 +42,9 @@ function networkMap () {
           if (err)
               throw err;
           var f = root.lookupType("transit_network.Feed");
-
           var xhr = new XMLHttpRequest();
-          var vp = "https://dl.dropboxusercontent.com/s/2pth0fbgb8meiip/networkstate.pb?dl=1";
+        //   var vp = "https://dl.dropboxusercontent.com/s/2pth0fbgb8meiip/networkstate.pb?dl=1";
+          var vp = "https://dl.dropboxusercontent.com/s/bxwpnllbt8i6ny7/nws.pb?dl=1";
           xhr.open("GET", vp, true);
           xhr.responseType = "arraybuffer";
           xhr.onload = function(evt) {
