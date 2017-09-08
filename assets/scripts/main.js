@@ -43,7 +43,6 @@ function networkMap () {
               throw err;
           var f = root.lookupType("transit_network.Feed");
           var xhr = new XMLHttpRequest();
-        //   var vp = "https://dl.dropboxusercontent.com/s/2pth0fbgb8meiip/networkstate.pb?dl=1";
           var vp = "https://dl.dropboxusercontent.com/s/bxwpnllbt8i6ny7/nws.pb?dl=1";
           xhr.open("GET", vp, true);
           xhr.responseType = "arraybuffer";
@@ -76,7 +75,10 @@ function networkMap () {
               },
               "properties": {
                 "delay": (feed.vehicles[i].delay ? feed.vehicles[i].delay : 0),
-                "delaytype": (feed.vehicles[i].delay ? (feed.vehicles[i].type == 0 ? "arrival" : "departure") : "")
+                "delaytype": (feed.vehicles[i].delay ? (feed.vehicles[i].type == 0 ? "arrival" : "departure") : ""),
+                "trip_id": feed.vehicles[i].tripId,
+                "distance": (feed.vehicles[i].pos.distance ?
+                    Math.round(feed.vehicles[i].pos.distance) : -1)
               }
             });
           }
@@ -98,7 +100,14 @@ function networkMap () {
                          "#990000" ))))))),
                   weight: 0,
                   fillOpacity: 0.8
-              });
+              }).bindPopup(
+                  (feature.properties.delay ?
+                    "<p>Vehicle is " + Math.abs(feature.properties.delay) +
+                    " seconds " + (feature.properties.delay > 0 ? "late" : "early") + "</p>" :
+                    "<p>Vehicle's delay information unavilable.</p>") +
+                  (feature.properties.distance >= 0 ?
+                    "<p>Currently " + feature.properties.distance + "m into trip</p>" : "")
+              );
           }
       }).addTo(map);
     };
