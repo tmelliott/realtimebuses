@@ -221,7 +221,7 @@ function setupSVG () {
     //         .attr("class", "traceline traceearlier");
     window.data.trace.g.append("g")
         .append("path")
-            .attr("class", "traceline traceearly");
+            .attr("class", "traceline traceearlier");
     // window.data.trace.g.append("g")
     //     .append("path")
     //         .attr("class", "traceline tracelate");
@@ -303,7 +303,7 @@ function setTrace (feed) {
         .attr("d", window.data.trace.lineGen(feed.trace));
     // var traceearlier = d3.select(".traceearlier")
     //     .attr("d", window.data.trace.lineGen2(feed.trace));
-    var traceearly = d3.select(".traceearly")
+    var traceearly = d3.select(".traceearlier")
         .attr("d", window.data.trace.lineGen3(feed.trace));
     // var tracelate = d3.select(".tracelate")
     //     .attr("d", window.data.trace.lineGen4(feed.trace));

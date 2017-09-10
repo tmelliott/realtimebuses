@@ -10577,7 +10577,7 @@ section#networkStatus {
         margin: 0 2px 0 20px;
         background: #26d926; }
         section#networkStatus .panel4 p span.early {
-          background: #28aebb; }
+          background: #6387ef; }
         section#networkStatus .panel4 p span.late {
           background: #d35400; }
 
@@ -10634,10 +10634,10 @@ section#networkStatus {
     stroke: #26d926;
     stroke-width: 3;
     opacity: 1; }
+  #historytrace .traceearlier {
+    stroke: #6387ef; }
   #historytrace .traceearly {
     stroke: #28aebb; }
-  #historytrace .traceearlier {
-    stroke: #3c42a5; }
   #historytrace .tracelate {
     stroke: #f39c12; }
   #historytrace .tracelater {
