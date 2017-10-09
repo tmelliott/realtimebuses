@@ -43,7 +43,7 @@ function networkMap () {
               throw err;
           var f = root.lookupType("transit_network.Feed");
           var xhr = new XMLHttpRequest();
-          var vp = "https://dl.dropboxusercontent.com/s/bxwpnllbt8i6ny7/nws.pb?dl=1";
+          var vp = "https://dl.dropboxusercontent.com/s/2pth0fbgb8meiip/networkstate.pb?dl=1";
           xhr.open("GET", vp, true);
           xhr.responseType = "arraybuffer";
           xhr.onload = function(evt) {
@@ -75,10 +75,7 @@ function networkMap () {
               },
               "properties": {
                 "delay": (feed.vehicles[i].delay ? feed.vehicles[i].delay : 0),
-                "delaytype": (feed.vehicles[i].delay ? (feed.vehicles[i].type == 0 ? "arrival" : "departure") : ""),
-                "trip_id": feed.vehicles[i].tripId,
-                "distance": (feed.vehicles[i].pos.distance ?
-                    Math.round(feed.vehicles[i].pos.distance) : -1)
+                "delaytype": (feed.vehicles[i].delay ? (feed.vehicles[i].type == 0 ? "arrival" : "departure") : "")
               }
             });
           }
