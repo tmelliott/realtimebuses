@@ -44,19 +44,41 @@ message Vehicle {
 
     // vehicle ID for referencing it
     required string id = 1;
-    // position of vehicle
+
+	// position of vehicle
     optional Position pos = 2;
-    // current delay
+
+	// current delay
     optional int32 delay = 3;
-    // delay type
+
+	// delay type
     optional DelayType type = 4;
-    // timestamp
+
+	// timestamp
     required uint64 timestamp = 5;
+
+	// ETA and route info
+	repeated ETA etas = 6;
+	optional string trip_id = 7;
 }
 
 message Position {
+	// The position of a bus, + estimated state (distance + speed)
 	required double lat = 1;
 	required double lng = 2;
+	optional double distance = 3;
+	optional double speed = 4;
+}
+
+message ETA {
+	// Info about upcoming ETAs
+	required uint32 stop_seq = 1;
+	required string stop_id = 2;
+	// Point estimate of arrial time
+	optional uint64 est = 3;
+	// Min/Max arrival times (in minutes!), as ETA = est + min/max
+	optional int32 min = 4;
+	optional int32 max = 5;
 }
 
 message State {
