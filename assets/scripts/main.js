@@ -245,7 +245,7 @@ function setupSVG () {
     //         .attr("class", "traceline traceverylate");
     var today = new Date();
     var start = new Date(today.getFullYear() + "-" +
-        (today.getMonth()+1) + "-" + today.getDate()).getTime()/1000;
+        (today.getMonth()+1) + "-" + today.getDate() + " 00:00:00").getTime()/1000;
     window.data.trace.lineGen = d3.line()
         .defined(function(d) {
             return !isNaN(d.ontime);
