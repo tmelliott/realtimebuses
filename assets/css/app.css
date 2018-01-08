@@ -10430,31 +10430,32 @@ html, body, #mainContainer {
 table {
   font-size: 10px; }
 
-#displayNetwork, #displayRoute {
-  margin-top: 25%;
+.display-page {
+  margin-top: 25vh;
   text-align: center;
   position: relative;
   transition: all 200ms ease-in-out; }
-  #displayNetwork h1, #displayRoute h1 {
+  .display-page h1 {
     position: absolute;
     top: 50%;
     left: 0;
     right: 0;
     -webkit-transform: translateY(-50%);
             transform: translateY(-50%); }
-  #displayNetwork:hover, #displayRoute:hover {
+  .display-page:hover {
     cursor: pointer;
     -webkit-transform: scale(1.02);
             transform: scale(1.02);
     z-index: 1; }
 
 #displayNetwork {
-  background: orange;
-  margin-right: 10%; }
+  background: salmon; }
 
 #displayRoute {
-  background: lightblue;
-  margin-left: 10%; }
+  background: lightblue; }
+
+#displayHistory {
+  background: lightgreen; }
 
 section#networkMap {
   position: absolute;
@@ -10661,6 +10662,16 @@ section#networkStatus {
   #historytrace .axis-left {
     -webkit-transform: translateX(30px);
             transform: translateX(30px); }
+  #historytrace.historytrace-large {
+    width: 80vw;
+    height: 80vh;
+    margin: 10vh auto 0 10vw; }
+    #historytrace.historytrace-large .axis stroke {
+      stroke: black; }
+    #historytrace.historytrace-large .axis line {
+      stroke: rgba(0, 0, 0, 0.2); }
+    #historytrace.historytrace-large .axis text {
+      fill: black; }
 
 #routeInfo {
   background: white;

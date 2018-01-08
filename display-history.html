@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Realtime Auckland Transit Network</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/app.css">
+  </head>
+  <body>
+
+    <div class="container-fluid" id="mainContainer">
+        <h1>Delays for <span id="delayDate"></span></h1>
+        
+
+        <svg id="historytrace" class="historytrace-large"></svg>
+    </div>
+
+    <script src="assets/js/app.min.js"></script>
+    <script type="text/javascript">
+        var FILES, curr = 0, data = {};
+        loadHistory();
+    </script>
+  </body>
+</html>

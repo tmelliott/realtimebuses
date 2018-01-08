@@ -6,6 +6,9 @@ function indexBtns () {
     $("#displayRoute").on("click", function(e) {
         window.location.href = "display-route.html";
     });
+    $("#displayHistory").on("click", function(e) {
+        window.location.href = "display-history.html";
+    });
 };
 
 
@@ -247,7 +250,11 @@ function setupSVG () {
         .defined(function(d) {
             return !isNaN(d.ontime);
         })
-        .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+        .x(function(d) { 
+            // return xscale((d.timestamp - start)/60/60); 
+            var x = new Date(d.timestamp * 1000);
+            return xscale(x.getHours() + x.getMinutes() / 60 + x.getSeconds() / 60 / 60); 
+        })
         .y(function(d) { return yscale(d.ontime); })
         .curve(d3.curveBasisOpen);
     // window.data.trace.lineGen2 = d3.line()
@@ -257,7 +264,11 @@ function setupSVG () {
     //     .curve(d3.curveBasisOpen);
     window.data.trace.lineGen3 = d3.line()
         .defined(function(d) {return !isNaN(d.early) && !isNaN(d.earlier); })
-        .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+        .x(function(d) { 
+            // return xscale((d.timestamp - start)/60/60); 
+            var x = new Date(d.timestamp * 1000);
+            return xscale(x.getHours() + x.getMinutes() / 60 + x.getSeconds() / 60 / 60)
+;        })
         .y(function(d) { return yscale(d.early + d.earlier); })
         .curve(d3.curveBasisOpen);
     // window.data.trace.lineGen4 = d3.line()
@@ -273,7 +284,11 @@ function setupSVG () {
             return !isNaN(d.later) && !isNaN(d.late) &&
                 !isNaN(d.quitelate) && !isNaN(d.verylate);
         })
-        .x(function(d) { return xscale((d.timestamp - start)/60/60); })
+        .x(function(d) { 
+            // return xscale((d.timestamp - start)/60/60); 
+            var x = new Date(d.timestamp * 1000);
+            return xscale(x.getHours() + x.getMinutes() / 60 + x.getSeconds() / 60 / 60);
+        })
         .y(function(d) {
             return yscale(d.late + d.later + d.quitelate + d.verylate);
         })
