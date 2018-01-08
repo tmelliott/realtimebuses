@@ -28,8 +28,6 @@ function loopHistory () {
     var date = FILES[curr].date,
         url = FILES[curr].url;
 
-    console.log(curr);
-
     // download the feed, and set things ...
     protobuf.load("server/proto/gtfs-network.proto", function(err, root) {
         if (err)
