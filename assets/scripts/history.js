@@ -20,9 +20,14 @@ function loadHistory () {
 
 
 function loopHistory () {
+    if (curr < 0) curr = FILES.length - 1;
+
     var date = FILES[curr].date,
         url = FILES[curr].url;
     curr++;
+    
+    if (curr >= FILES.length) curr = 0;
+
     // download the feed, and set things ...
     protobuf.load("server/proto/gtfs-network.proto", function(err, root) {
         if (err)
