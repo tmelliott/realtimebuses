@@ -13,20 +13,22 @@ function loadHistory () {
         FILES.forEach(function(d) { 
             d.date = new Date(d.date); 
         });
-        setInterval(loopHistory, 30000);
+        // setInterval(loopHistory, 30000);
         loopHistory();
     });
 }
 
 
 function loopHistory () {
+    clearTimeout(timer);
+    curr++;
     if (curr < 0) curr = FILES.length - 1;
+    if (curr >= FILES.length) curr = 0;
 
     var date = FILES[curr].date,
         url = FILES[curr].url;
-    curr++;
-    
-    if (curr >= FILES.length) curr = 0;
+
+    console.log(curr);
 
     // download the feed, and set things ...
     protobuf.load("server/proto/gtfs-network.proto", function(err, root) {
@@ -46,4 +48,6 @@ function loopHistory () {
         }
         xhr.send(null);
     });
+
+    timer = setTimeout(loopHistory, 20000);
 }

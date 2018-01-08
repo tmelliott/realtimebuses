@@ -20,12 +20,12 @@
 
     <script src="assets/js/app.min.js"></script>
     <script type="text/javascript">
-        var FILES, curr = 0, data = {};
+        var FILES, curr = -1, data = {}, timer;
         loadHistory();
         $("#next").on('click', loopHistory);
         $("#prev").on('click', function() {
           curr -= 2;
-          loopHistory()
+          loopHistory();
         });
     </script>
   </body>
