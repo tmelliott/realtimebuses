@@ -9,8 +9,11 @@
   <body>
 
     <div class="container-fluid" id="mainContainer">
-        <h1>Delays for <span id="delayDate"></span></h1>
-        
+        <div class="">
+          <h1>Delays for <span id="delayDate"></span></h1>
+          <button id="prev">&lt; Previous</button>
+          <button id="next">Next &gt;</button>
+        </div>
 
         <svg id="historytrace" class="historytrace-large"></svg>
     </div>
@@ -19,6 +22,11 @@
     <script type="text/javascript">
         var FILES, curr = 0, data = {};
         loadHistory();
+        $("#next").on('click', loopHistory);
+        $("#prev").on('click', function() {
+          curr -= 2;
+          loopHistory()
+        });
     </script>
   </body>
 </html>
