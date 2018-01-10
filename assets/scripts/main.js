@@ -195,18 +195,16 @@ function setupSVG () {
     var ht = $("#historytrace").outerHeight(),
         wd = $("#historytrace").outerWidth();
     var xscale = d3.scaleLinear()
-        // up to 24 hours ago
-        // .domain([24*60*60, 0])
         .domain([5, 24]) // from 5am - midnight
         .range([40, wd-40]);
     var yscale = d3.scaleLinear()
         .domain([0, 100])
-        .range([ht-40, 10]);
+        .range([ht-60, 10]);
 
     // axis here
     window.data.trace.g.append("g")
         .attr("class", "axis axis-left")
-        .call(d3.axisLeft(yscale).ticks(6).tickSize(-(wd-40)));
+        .call(d3.axisLeft(yscale).ticks(6).tickSize(-(wd-60)));
     window.data.trace.g.append("g")
         .attr("style", "transform: translateY(" + (ht-30) + "px)")
         .attr("class", "axis axis-bottom")

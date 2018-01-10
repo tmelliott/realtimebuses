@@ -10673,6 +10673,9 @@ section#networkStatus {
     #historytrace.historytrace-large .axis text {
       fill: black; }
 
+.raindrop {
+  fill: #1666c5; }
+
 #routeInfo {
   background: white;
   position: relative; }
