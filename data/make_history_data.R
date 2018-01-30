@@ -174,5 +174,14 @@ p <- ggplot(Qhist.cal, aes(x = .time, group = date)) +
     geom_ribbon(aes(ymin = .q125, ymax = .q875), data = Qhist.weekend, fill = "#2c7aaa") +
     geom_ribbon(aes(ymin = .q25, ymax = .q75), fill = "black")
 
-p1 <- prettify(p, label.padding = unit(0.08, "lines"), label = c("label", "text", "text2"))
-p1
+p2 <- prettify(p, label.padding = unit(0.08, "lines"), label = c("label", "text", "text2"))
+
+pleg <- ggplot(data.frame(x = factor(1:3, labels = c('90% of buses', '75% of buses', '50% of buses'))),
+               aes(x = x, fill = x)) +
+    geom_bar() + labs(fill = "") +
+    scale_fill_manual(values=c("#bd9218", "51a7f9", "black"))
+tmp <- ggplot_gtable(ggplot_build(pleg))
+legend <- tmp$grobs[[which(sapply(tmp$grobs, function(x) x$name) == "guide-box")]]
+
+gridExtra::grid.arrange(p2, legend, ncol = 2, 
+    widths = grid::unit.c(grid::unit(1, 'null'), sum(legend$widths)))
