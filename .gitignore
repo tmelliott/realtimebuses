@@ -3,6 +3,7 @@ _site
 node_modules
 
 *.Rdump
+*.csv
 
 # Created by https://www.gitignore.io
 
