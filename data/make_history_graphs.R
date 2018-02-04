@@ -51,10 +51,12 @@ pleg <- ggplot(data.frame(x = factor(1:5, labels = c('10+ min late', '5-10 min l
 tmp <- ggplot_gtable(ggplot_build(pleg))
 legend1 <- tmp$grobs[[which(sapply(tmp$grobs, function(x) x$name) == "guide-box")]]
 
-# jpeg("~/Dropbox/gtfs/figs/history_n.jpg", width = 1920, height = 1080)
+if (!interactive())
+    jpeg("~/Dropbox/gtfs/figs/history_n.jpg", width = 1920, height = 1080)
 gridExtra::grid.arrange(p1, legend1, ncol = 2, 
-    widths = grid::unit.c(grid::unit(1, 'null'), sum(legend$widths)))
-# dev.off()
+    widths = grid::unit.c(grid::unit(1, 'null'), sum(legend1$widths)))
+if (!interactive())
+    dev.off()
 
 qmax <- 30
 qmin <- -15
@@ -123,11 +125,13 @@ pleg <- ggplot(data.frame(x = factor(1:3, labels = c('90% of buses', '75% of bus
 tmp <- ggplot_gtable(ggplot_build(pleg))
 legend2 <- tmp$grobs[[which(sapply(tmp$grobs, function(x) x$name) == "guide-box")]]
 
-# jpeg("~/Dropbox/gtfs/figs/history_q.jpg", width = 1920, height = 1080)
+if (!interactive())
+    jpeg("~/Dropbox/gtfs/figs/history_q.jpg", width = 1920, height = 1080)
 gridExtra::grid.arrange(p2, legend2, ncol = 2, 
-    widths = grid::unit.c(grid::unit(1, 'null'), sum(legend$widths)))
-# dev.off()
+    widths = grid::unit.c(grid::unit(1, 'null'), sum(legend2$widths)))
+if (!interactive())
+    dev.off()
 
 
-gridExtra::grid.arrange(p1, legend1, p2, legend2, ncol = 2, nrow = 2,
-    widths = grid::unit.c(grid::unit(1, 'null'), sum(legend$widths)))
+# gridExtra::grid.arrange(p1, legend1, p2, legend2, ncol = 2, nrow = 2,
+#     widths = grid::unit.c(grid::unit(1, 'null'), sum(legend$widths)))

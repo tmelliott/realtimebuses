@@ -11,6 +11,7 @@ readProtoFiles(dir = 'assets/protobuf')
 
 dothedata <- function(DATES) {
     DATES <- DATES[sapply(DATES, function(x) !any(grepl(x, list.files('data/history'))))]
+    if (length(DATES) == 0) return()
     con <- "tom@130.216.51.230"
     Nhistory <- matrix(0L, ncol = 5, nrow = (24 - 5) * (60 / 5) * length(DATES))
     Qhistory <- matrix(0.0, ncol = 6, nrow = (24 - 5) * (60 / 5) * length(DATES))
@@ -42,10 +43,19 @@ dothedata <- function(DATES) {
             pb <- read(transit_realtime.FeedMessage, pipe(sprintf("ssh %s cat %s", con, file)))$entity
 
             delays <- sapply(pb, function(x) {
-                ifelse(x$trip_update$stop_time_update[[1]]$has('arrival'),
-                       x$trip_update$stop_time_update[[1]]$arrival$delay,
-                       x$trip_update$stop_time_update[[1]]$departure$delay)
+                if (x$has('trip_update')) {
+                    tus <- x$trip_update$stop_time_update
+                    if (length(tus) == 1) {
+                        tu <- tus[[1]]
+                        if (tu$has('arrival'))
+                            if (tu$arrival$has('delay')) return(tu$arrival$delay)
+                        if (tu$has('departure'))
+                            if (tu$departure$has('delay')) return (tu$departure$delay)
+                    }
+                }
+                return(NA)
             })
+            delays <- delays[!is.na(delays)]
             
             Nt <- integer(5)
             Nt[1] <- sum(delays < -10 * 60)
@@ -73,6 +83,7 @@ dothedata <- function(DATES) {
                 sprintf("%s/history_%s.csv", dir, format(Times[k[1]], "%Y-%m-%d")),
                 quote = FALSE, row.names = FALSE)
         }))
+    unlink('data/history/history_1970-01-01.csv')
 }
 
 # XL <- dget("bushistory.Rdump")
@@ -92,7 +103,10 @@ dothedata <- function(DATES) {
 # DATES <- as.Date(BEGIN:END, origin = "1970-01-01")
 # DATES <- DATES[sapply(DATES, function(x) !any(grepl(x, list.files('data/history'))))]
 
-DATES <- as.Date("2017-11-01", origin = "1970-01-01"):as.Date("2017-12-01", origin = "1970-01-01")
-DATES <- as.Date(DATES[-length(DATES)], origin = "1970-01-01")
 
-dothedata(DATES)
+for (i in 9:10) {
+    START <- as.Date(sprintf("2017-%02d-01", i), origin = "1970-01-01")
+    END <- as.Date(sprintf("2017-%02d-01", i+1), origin = "1970-01-01") - 1
+    DATES <- as.Date(START:END, origin = "1970-01-01")
+    dothedata(DATES)
+}
