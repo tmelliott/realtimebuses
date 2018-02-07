@@ -9,8 +9,9 @@
 library(RProtoBuf)
 readProtoFiles(dir = 'assets/protobuf')
 
-dothedata <- function(DATES) {
-    DATES <- DATES[sapply(DATES, function(x) !any(grepl(x, list.files('data/history'))))]
+dothedata <- function(DATES, overwrite = FALSE) {
+    if (!overwrite)
+        DATES <- DATES[sapply(DATES, function(x) !any(grepl(x, list.files('data/history'))))]
     if (length(DATES) == 0) return()
     con <- "tom@130.216.51.230"
     Nhistory <- matrix(0L, ncol = 5, nrow = (24 - 5) * (60 / 5) * length(DATES))
@@ -56,15 +57,16 @@ dothedata <- function(DATES) {
                 return(NA)
             })
             delays <- delays[!is.na(delays)]
-            
-            Nt <- integer(5)
-            Nt[1] <- sum(delays < -10 * 60)
-            Nt[2] <- sum(delays >= -10 * 60 & delays < -5 * 60)
-            Nt[3] <- sum(delays >= -5 * 60 & delays < 5 * 60)
-            Nt[4] <- sum(delays >= 5 * 60 & delays < 10 * 60)
-            Nt[5] <- sum(delays >= 10 * 60)
-            Nhistory[k, ] <- Nt
-            Qhistory[k, ] <- quantile(delays, c(0.05, 0.125, 0.25, 0.75, 0.875, 0.95)) / 60
+            if (length(delays) > 0) {
+              Nt <- integer(5)
+              Nt[1] <- sum(delays < -10 * 60)
+              Nt[2] <- sum(delays >= -10 * 60 & delays < -5 * 60)
+              Nt[3] <- sum(delays >= -5 * 60 & delays < 5 * 60)
+              Nt[4] <- sum(delays >= 5 * 60 & delays < 10 * 60)
+              Nt[5] <- sum(delays >= 10 * 60)
+              Nhistory[k, ] <- Nt
+              Qhistory[k, ] <- quantile(delays, c(0.05, 0.125, 0.25, 0.75, 0.875, 0.95)) / 60
+            }
             Times[k] <- as.integer(t)
         }
     }
@@ -76,9 +78,11 @@ dothedata <- function(DATES) {
         as.factor(format(Times, "%Y-%m-%d")), 
         function(k) {
             res <- cbind(as.integer(Times[k]), Nhistory[k, ], round(Qhistory[k, ], 2))
+	    try({
             colnames(res) <- 
                 c("time", "veryearly", "early", "ontime", "late", "verylate",
                   "q0.05", "q0.125", "q0.25", "q0.75", "q0.875", "q0.9")
+            })
             write.csv(res,
                 sprintf("%s/history_%s.csv", dir, format(Times[k[1]], "%Y-%m-%d")),
                 quote = FALSE, row.names = FALSE)
@@ -86,27 +90,17 @@ dothedata <- function(DATES) {
     unlink('data/history/history_1970-01-01.csv')
 }
 
-# XL <- dget("bushistory.Rdump")
-# Nhistory <- XL[[1]]
-# Qhistory <- XL[[2]]
-# Times <- XL[[3]]
-# rm(XL)
-
-
-# DATE <- Sys.Date()
-# DOW <- as.numeric(format(DATE, "%w"))
-
-# ## want to get Monday of this week
-# MON <- DATE - ifelse(DOW == 0, 6, DOW - 1)
-# BEGIN <- MON - 4 * 7
-# END <- DATE - 1
-# DATES <- as.Date(BEGIN:END, origin = "1970-01-01")
-# DATES <- DATES[sapply(DATES, function(x) !any(grepl(x, list.files('data/history'))))]
-
-
-for (i in 9:10) {
-    START <- as.Date(sprintf("2017-%02d-01", i), origin = "1970-01-01")
-    END <- as.Date(sprintf("2017-%02d-01", i+1), origin = "1970-01-01") - 1
+ca <- commandArgs(TRUE)
+if (length(ca) == 0) {
+    ## just do today
+    dothedata(Sys.Date(), overwrite = TRUE)
+}
+year <- ifelse(length(ca) == 2, ca[2], format(Sys.Date(), "%Y"))
+ca <- eval(parse(text = ca[1]))
+for (i in ca) {
+    START <- as.Date(sprintf("%s-%02d-01", year, i), origin = "1970-01-01")
+    END <- as.Date(sprintf("%s-%02d-01", year, i+1), origin = "1970-01-01") - 1
     DATES <- as.Date(START:END, origin = "1970-01-01")
+    cat(sprintf("\n***\nDealing with %s %s...\n", format(START, "%B"), year))
     dothedata(DATES)
 }
