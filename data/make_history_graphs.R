@@ -162,4 +162,5 @@ makePlots <- function(which = c("year", "6months", "3months", "month")) {
 
 
 ca <- commandArgs(TRUE)
-if (length(ca) == 0) makePlots() else sapply(ca, makePlots)
+if (length(ca) == 0) ca <- c("y", "6", "3", "m")
+sapply(ca, makePlots)
