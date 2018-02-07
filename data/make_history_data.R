@@ -91,10 +91,11 @@ dothedata <- function(DATES, overwrite = FALSE) {
 }
 
 ca <- commandArgs(TRUE)
+print(ca)
 if (length(ca) == 0) {
     ## just do today
     dothedata(Sys.Date(), overwrite = TRUE)
-}
+} else {
 year <- ifelse(length(ca) == 2, ca[2], format(Sys.Date(), "%Y"))
 ca <- eval(parse(text = ca[1]))
 for (i in ca) {
@@ -103,4 +104,5 @@ for (i in ca) {
     DATES <- as.Date(START:END, origin = "1970-01-01")
     cat(sprintf("\n***\nDealing with %s %s...\n", format(START, "%B"), year))
     dothedata(DATES)
+}
 }
