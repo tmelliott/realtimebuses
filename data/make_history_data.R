@@ -106,3 +106,7 @@ for (i in ca) {
     dothedata(DATES)
 }
 }
+
+
+
+source("data/make_history_graphs.R")
