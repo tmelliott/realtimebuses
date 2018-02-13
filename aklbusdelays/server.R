@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lubridate)
 library(sugrrants)
 library(magrittr)
 
@@ -100,7 +101,15 @@ makePlots <- function(dates, which = c("n", "q"), calendar = c('monthly', 'weekl
 }
 
 
-function(input, output) {
+function(input, output, session) {
+    observeEvent(input$datepresets, {
+        start <- Sys.Date() %m-% 
+            months(as.numeric(input$datepresets) - 1) %>%
+            format('%Y-%m-01')
+        if (start < as.Date('2017-03-13')) start <- as.Date('2017-03-13')
+        updateDateRangeInput(session, "dates", start = start)
+    })
+
     output$hist <- renderPlot({
         makePlots(input$dates, which = input$type, calendar = input$caltype)
     })

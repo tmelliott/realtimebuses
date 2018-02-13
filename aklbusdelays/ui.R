@@ -4,27 +4,31 @@ start.date <- format(today, "%Y-%m-01")
 fillPage(fillCol(
     headerPanel("Auckland Transport Bus Delays"),
 
-    mainPanel(
+    mainPanel(wellPanel(
         flowLayout(
-            dateRangeInput(
-                "dates", "Choose a range of dates to view",
-                start = start.date, end = today,
-                min = "2017-03-13", max = today,
-                startview = "year",
-                format = "dd M yyyy"
-            ),
 
             radioButtons(
                 "type", "Plot type", list(`Number` = "n", `Quantiles` = "q")
             ),
 
             radioButtons(
-                "caltype", "View calendar in", list("months" = "monthly", "weeks" = "weekly")
-            )
-        ),
+                "caltype", "View calendar in", list("months" = "monthly", "weeks (buggy)" = "weekly")
+            ),
 
-        width = 12
-    ),
+            selectInput(
+                'datepresets', 'View how many months?',
+                c(1, 2, 3, 6, 12)
+            ),
+
+            dateRangeInput(
+                "dates", "Or choose a range of dates to view",
+                start = start.date, end = today,
+                min = "2017-03-13", max = today,
+                startview = "year",
+                format = "dd M yyyy"
+            )
+        )
+    ), width = 12),
 
     plotOutput("hist", height = "100%"),
 
