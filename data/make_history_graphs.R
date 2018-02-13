@@ -133,5 +133,5 @@ if (!interactive())
     dev.off()
 
 
-# gridExtra::grid.arrange(p1, legend1, p2, legend2, ncol = 2, nrow = 2,
-#     widths = grid::unit.c(grid::unit(1, 'null'), sum(legend$widths)))
+
+save(Nhist, Qhist, file = "~/Dropbox/gtfs/delayhistory.rda")
