@@ -158,16 +158,18 @@ makePlots <- function(which = c("year", "6months", "3months", "month")) {
         widths = grid::unit.c(grid::unit(1, 'null'), sum(legend2$widths)))
     dev.off()
 
+
+    save(Nhist, Qhist, file = "~/Dropbox/gtfs/delayhistory.rda")
+
 }
 
 
-ca <- commandArgs(TRUE)
-if (length(ca) == 0) ca <- c("y", "6", "3", "m")
-sapply(ca, makePlots)
+# ca <- commandArgs(TRUE)
+# if (length(ca) == 0) ca <- c("y", "6", "3", "m")
+# sapply(ca, makePlots)
 
-
+makePlots("m")
 
 
 save(Nhist, Qhist, file = "~/Dropbox/gtfs/delayhistory.rda")
-unlink("Rplots.pdf")
 
