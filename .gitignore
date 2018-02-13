@@ -4,6 +4,7 @@ node_modules
 
 *.Rdump
 *.csv
+*.log
 
 # Created by https://www.gitignore.io
 
