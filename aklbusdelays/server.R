@@ -41,7 +41,7 @@ makePlots <- function(dates, which = c("n", "q"), calendar = c('monthly', 'weekl
             Qhist.cal <- Qhist %>% 
                 filter(date >= dates[1] & date <= dates[2]) %>%
                 frame_calendar(x = time, y = vars(dummy, q5, q125, q25, q75, q875, q95, zero), 
-                               date = date)
+                               date = date, calendar = calendar)
             Qhist.week <- Qhist.cal %>% filter(weekend == "no")
             Qhist.weekend <- Qhist.cal %>% filter(weekend == "yes")
             zeroline <- with(Qhist.cal, tapply(.dummy, date, function(x) {
