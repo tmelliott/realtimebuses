@@ -170,6 +170,3 @@ makePlots <- function(which = c("year", "6months", "3months", "month")) {
 
 makePlots("m")
 
-
-save(Nhist, Qhist, file = "~/Dropbox/gtfs/delayhistory.rda")
-
