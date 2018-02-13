@@ -6,15 +6,16 @@ con <- url("https://dl.dropboxusercontent.com/s/cemi1ctf7wzbj3k/delayhistory.rda
 load(con)
 close(con)
 
-makePlots <- function(dates, which = c("n", "q")) {
+makePlots <- function(dates, which = c("n", "q"), calendar = c('monthly', 'weekly')) {
     which <- match.arg(which)
+    calendar <- match.arg(calendar)
 
     switch(which, 
         "n" = {
             Nhist.cal <- Nhist %>% 
                 filter(date >= dates[1] & date <= dates[2]) %>%
                 frame_calendar(x = time, y = vars(dummy, vlate, zero, vearly, early, ontime, late), 
-                               date = date)
+                               date = date, calendar = calendar)
             p <- ggplot(Nhist.cal, aes(x = .time, ymin = .zero, group = date)) +
                 geom_ribbon(aes(ymax = .vlate), fill = "#bb0000") +
                 geom_ribbon(aes(ymax = .late), fill = "orange") +
@@ -101,6 +102,6 @@ makePlots <- function(dates, which = c("n", "q")) {
 
 function(input, output) {
     output$hist <- renderPlot({
-        makePlots(input$dates, which = input$type)
+        makePlots(input$dates, which = input$type, calendar = input$caltype)
     })
 }

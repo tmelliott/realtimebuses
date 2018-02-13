@@ -16,6 +16,10 @@ fillPage(fillCol(
 
             radioButtons(
                 "type", "Plot type", list(`Number` = "n", `Quantiles` = "q")
+            ),
+
+            radioButtons(
+                "caltype", "View calendar in", list("months" = "monthly", "weeks" = "weekly")
             )
         ),
 
