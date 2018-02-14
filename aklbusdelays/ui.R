@@ -1,6 +1,3 @@
-today <- Sys.Date()
-start.date <- format(today, "%Y-%m-01")
-
 fillPage(fillCol(
     headerPanel("Auckland Transport Bus Delays"),
 
@@ -22,8 +19,8 @@ fillPage(fillCol(
 
             dateRangeInput(
                 "dates", "Or choose a range of dates to view",
-                start = start.date, end = today,
-                min = "2017-03-13", max = today,
+                start = format(.MAXDATE, "%Y-%m-01"), end = .MAXDATE,
+                min = .MINDATE, max = .MAXDATE,
                 startview = "year",
                 format = "dd M yyyy"
             )

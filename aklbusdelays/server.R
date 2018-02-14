@@ -3,9 +3,7 @@ library(lubridate)
 library(sugrrants)
 library(magrittr)
 
-con <- url("https://dl.dropboxusercontent.com/s/cemi1ctf7wzbj3k/delayhistory.rda?dl=1")
-load(con)
-close(con)
+
 
 makePlots <- function(dates, which = c("n", "q"), calendar = c('monthly', 'weekly')) {
     which <- match.arg(which)
@@ -103,10 +101,10 @@ makePlots <- function(dates, which = c("n", "q"), calendar = c('monthly', 'weekl
 
 function(input, output, session) {
     observeEvent(input$datepresets, {
-        start <- Sys.Date() %m-% 
+        start <- .MAXDATE %m-% 
             months(as.numeric(input$datepresets) - 1) %>%
             format('%Y-%m-01')
-        if (start < as.Date('2017-03-13')) start <- as.Date('2017-03-13')
+        if (start < .MINDATE) start <- .MINDATE
         updateDateRangeInput(session, "dates", start = start)
     })
 
