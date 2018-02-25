@@ -1,0 +1,26 @@
+---
+title: "March Madness!"
+author: "Tom Elliott"
+output: 
+    revealjs::revealjs_presentation
+---
+
+```{r}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## What is March Madess?
+
+- Busiest month of the year for public transport
+- Buses, trains at capacity
+
+
+## How are we doing so far?
+
+- Here's a graph of the number of buses running, broken down
+  by the delay
+
+```{r marchsofar}
+load('~/Dropbox/gtfs/delayhistory.rda')
+plot(1:10)
+```
