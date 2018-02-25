@@ -162,10 +162,3 @@ makePlots <- function(which = c("year", "6months", "3months", "month")) {
 
 }
 
-
-# ca <- commandArgs(TRUE)
-# if (length(ca) == 0) ca <- c("y", "6", "3", "m")
-# sapply(ca, makePlots)
-
-makePlots("m")
-unlink("Rplots.pdf")

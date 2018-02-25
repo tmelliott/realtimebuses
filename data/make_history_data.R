@@ -110,3 +110,6 @@ for (i in ca) {
 
 
 source("data/make_history_graphs.R")
+makePlots("m")
+unlink("Rplots.pdf")
+

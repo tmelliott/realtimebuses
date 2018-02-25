@@ -1,0 +1,18 @@
+.reveal section img {
+    border: none;
+    box-shadow: none;
+}
+
+.reveal section .bigN {
+    font-size: 2em;
+    font-weight: bold;
+}
+.reveal section .late {
+    color: #d35400;
+}
+.reveal section .ontime {
+    color: #1c9c1c;
+}
+.reveal section .early {
+    color: #6387ef;
+}

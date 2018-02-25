@@ -1,26 +1,151 @@
 ---
-title: "March Madness!"
-author: "Tom Elliott"
+title: "March Madness"
+author: ""
 output: 
-    revealjs::revealjs_presentation
+    revealjs::revealjs_presentation:
+        css: march.css
+        reveal_options:
+            controls: false
+            loop: true
+            autoSlide: 20000
 ---
 
-```{r}
+```{r,echo=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## What is March Madess?
+```{r setup,results='hide',message=FALSE}
+source('makeplots.R')
+load('~/Dropbox/gtfs/delayhistory.rda')
+```
+
+## What is "March Madess"?
 
 - Busiest month of the year for public transport
 - Buses, trains at capacity
+- Officially starts February 26 (university O-week)
 
-
+<!--
 ## How are we doing so far?
 
-- Here's a graph of the number of buses running, broken down
-  by the delay
-
-```{r marchsofar}
-load('~/Dropbox/gtfs/delayhistory.rda')
-plot(1:10)
+```{r marchsofar, message=FALSE, warning=FALSE, error=FALSE, fig.height=6, fig.width=10}
+## makePlots(c("2018-02-26" %>% as.Date, "2018-03-31" %>% as.Date))
+makePlots(c("2018-02-01" %>% as.Date, "2018-03-31" %>% as.Date))
 ```
+-->
+
+```{r latest_ontime}
+Nlatest <- Nhist[nrow(Nhist), ]
+Qlatest <- Qhist[nrow(Qhist), ]
+tcur <- Nlatest$time
+tlatest <- paste0(floor(tcur), ":", (tcur %% 1) * 60, " ",
+                  ifelse(floor(tcur) < 12, "am", "pm"))
+total <- Nlatest$vlate
+early <- Nlatest$early
+ontime <- Nlatest$ontime - early
+late <- total - ontime - early
+```
+## As of `r tlatest` today
+
+
+* <span class='bigN ontime'>`r ontime`</span> of <span class='bigN total'>`r total`</span> buses were on time
+* <span class='bigN late'>`r late`</span> were running more than 5 minutes late
+* <span class='bigN early'>`r early`</span> were more than 5 minutes early
+
+```{r todaytrace, message=FALSE, warning=FALSE, error=FALSE, fig.height=3,fig.width=10}
+Nday <- Nhist %>% 
+    filter(Nhist$date == Sys.Date())
+ggplot(Nday, aes(x = time)) + 
+    geom_path(aes(y = (vlate - ontime) / vlate * 100),
+        color = "#d35400", lwd = 2) +
+    geom_path(aes(y = (ontime - early) / vlate * 100),
+        color = "#1c9c1c", lwd = 2) + 
+    geom_path(aes(y = early / vlate * 100),
+        color = "#6387ef", lwd = 2) +
+    ylim(0, 100) + xlim(5, 24) +
+    xlab("Time (hour)") + ylab("Percent of buses")
+```
+
+## How does this compare?
+
+* data from April through November 2017
+* average percentage of buses <strong class='early'>early</strong>, 
+  <strong class='ontime'>ontime</strong>, or <strong class='late'>late</strong>
+```{r averages, message=FALSE, warning=FALSE, error=FALSE,fig.height=4,fig.width=12}
+Nyear <- Nhist %>%
+    filter(date >= '2017-04-01' & date < '2017-12-01' & 
+           !format(date, '%a') %in% c('Sat', 'Sun')) %>%
+    mutate(dow = factor(format(date, '%A'),
+                        levels = c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 
+                                   'Friday')))
+## Filter out Mon-Fri with max less than 400
+dateMax <- with(Nyear, tapply(vlate, date, max))
+Nyear <- Nyear %>%
+    filter(dateMax[Nyear$date %>% as.character] > 730)
+Nlatest$dow <- factor(format(Nlatest$date, "%A"), levels = levels(Nyear$dow))
+Nday$dow <- factor(format(Nday$date, "%A"), levels = levels(Nyear$dow))
+ggplot(Nyear, aes(x = time)) + 
+    # geom_point(aes(y = vlate), color = "#d3540005") + 
+    # geom_point(aes(y = ontime), color = "#1c9c1c05") +
+    geom_smooth(aes(y = (vlate - ontime) / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#d35400") +
+    geom_smooth(aes(y = (ontime - early) / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#1c9c1c") +
+    geom_smooth(aes(y = early / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#6387ef") +
+    geom_point(aes(y = (vlate - ontime) / vlate * 100), data = Nlatest, color="#d35400", size = 2, stroke=2, pch = 4) +
+    geom_point(aes(y = (ontime - early) / vlate * 100), data = Nlatest, color="#1c9c1c", size = 2, stroke=2, pch = 4) +
+    geom_point(aes(y = early / vlate * 100), data = Nlatest, color="#6387ef", size = 2, stroke=2, pch = 4) +
+    # geom_path(aes(y = vlate), data = Nday, color = "#d35400", lty = 2) +
+    # geom_path(aes(y = ontime), data = Nday, color = "#1c9c1c", lty = 2) + 
+    # geom_path(aes(y = early), data = Nday, color = "#6387ef", lty = 2) +
+    facet_grid(~dow) +
+    xlab("Time (hour)") + ylab("Percent of buses") + ylim(0, 100)
+```
+* crosses show current values (as of `r tlatest`)
+
+
+## March Madess: % on-time
+
+```{r mmsofar, message=FALSE, warning=FALSE, error=FALSE,fig.height=5,fig.width=9}
+Nyearavg <- Nyear %>%
+    # group_by(dow, time) %>%
+    # summarise(zero = mean(zero),
+    #           vearly = mean(vearly),
+    #           early = mean(early),
+    #           ontime = mean(ontime),
+    #           late = mean(late),
+    #           vlate = mean(vlate)) %>%
+    # ungroup() %>%
+    mutate(week = 0)
+mm <- Nhist %>%
+    filter(date >= '2018-02-26' & date < '2018-04-01' &
+           !format(date, '%a') %in% c('Sat', 'Sun')) %>%
+    mutate(dow = factor(format(date, '%A'),
+                        levels = c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 
+                                   'Friday')),
+           week = (format(date, '%W') %>% as.numeric) - 8) %>%
+    select(zero, vearly, early, ontime, late, vlate, time, dow, week) %>%
+    # bind_rows(Nyearavg) %>%
+    mutate(week = factor(week, levels = 1:5, 
+                        labels = paste('Week', 1:5)))
+Nyearavg2 <- Nyearavg %>% 
+    select(zero, vearly, early, ontime, late, vlate, time, dow)
+ggplot(mm, aes(x = time)) +
+    geom_path(aes(y = (vlate - ontime) / vlate * 100), lwd = 1,
+        color = "#d35400", data = mm) + # %>% filter(week != "2017 Average")) +
+    geom_path(aes(y = (ontime - early) / vlate * 100), lwd = 1,
+        color = "#1c9c1c", data = mm) + # %>% filter(week != "2017 Average")) + 
+    geom_path(aes(y = early / vlate * 100), lwd = 1,
+        color = "#6387ef", data = mm) + # %>% filter(week != "2017 Average")) +
+    # geom_smooth(aes(y = (vlate - ontime) / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#d35400") +
+    # geom_smooth(aes(y = (ontime - early) / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#1c9c1c") +
+    # geom_smooth(aes(y = early / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#6387ef") +
+    geom_smooth(aes(y = (vlate - ontime) / vlate * 100), data = Nyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#d3540070", lty = 2, lwd = 0.5) +
+    geom_smooth(aes(y = (ontime - early) / vlate * 100), data = Nyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#1c9c1c70", lty = 2, lwd = 0.5) +
+    geom_smooth(aes(y = early / vlate * 100), data = Nyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#6387ef70", lty = 2, lwd = 0.5) +
+    facet_grid(week~dow, drop = FALSE) +
+    xlab("Time (hour)") + ylab("Percent of buses") + ylim(0, 100)
+```
+
+Monday 25 February &ndash; Friday 30 March
