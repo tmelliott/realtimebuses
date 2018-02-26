@@ -346,7 +346,7 @@ ggplot(mmq, aes(x = time)) +
 
 View the slides here:
 
-<span class='bigN'>bit.ly/madmarch18</span>
+<span class='bigN'>bit.ly/madmarch2018</span>
 
 <script>
 window.onload = function(e) {
