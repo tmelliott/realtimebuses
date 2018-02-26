@@ -4,6 +4,7 @@ author: "Tracking Auckland's bus delays<br>through its busiest month"
 date: "Based on historical and real-time data, updated approximately every 30 minutes,<br>obtained from Auckland Transport's public GTFS API"
 output: 
     revealjs::revealjs_presentation:
+        transition: fade
         css: march.css
         reveal_options:
             controls: false
