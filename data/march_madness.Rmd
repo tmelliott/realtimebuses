@@ -293,11 +293,14 @@ View the slides here:
 
 <script>
 window.onload = function(e) {
+    var timer;
     Reveal.addEventListener('slidechanged', function( event ) {
         if (Reveal.isLastSlide()) {
-            setTimeout(function() {
+            timer = setTimeout(function() {
                 window.location = 'http://tomelliott.co.nz/realtimebuses/mamarch.html';
             }, 20000);
+        } else {
+            clearTimeout(timer);
         }
     });
 };
