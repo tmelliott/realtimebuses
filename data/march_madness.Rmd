@@ -354,7 +354,7 @@ window.onload = function(e) {
     Reveal.addEventListener('slidechanged', function( event ) {
         if (Reveal.isLastSlide()) {
             timer = setTimeout(function() {
-                window.location = 'http://tomelliott.co.nz/realtimebuses/mamarch.html';
+                window.location = 'http://tomelliott.co.nz/realtimebuses/madmarch.html';
             }, 20000);
         } else {
             clearTimeout(timer);
