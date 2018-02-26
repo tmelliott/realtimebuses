@@ -41,7 +41,7 @@ Nhist %>% filter(date == "2018-02-19") %>%
         geom_area(aes(y = vlate), fill = "#d35400") +
         # geom_area(aes(y = late), fill = "orange") +
         geom_area(aes(y = ontime), fill = "#1c9c1c") + 
-        geom_area(aes(y = early), fill = "#6387ef") +
+        geom_area(aes(y = early), fill = "#3c42a5") +
         # geom_area(aes(y = vearly), fill = "#bb0000") +
         xlim(5, 24) +
         xlab("Time (hour)") + ylab("Number of buses") +
@@ -83,7 +83,7 @@ gridExtra::grid.arrange(
     ggplot(Nday, aes(x = time)) + 
         geom_area(aes(y = vlate), fill = "#d35400") +
         geom_area(aes(y = ontime), fill = "#1c9c1c") + 
-        geom_area(aes(y = early), fill = "#6387ef") +
+        geom_area(aes(y = early), fill = "#3c42a5") +
         xlim(5, 24) +
         xlab("Time (hour)") + ylab("Number of buses"),
     ggplot(Nday, aes(x = time)) + 
@@ -92,7 +92,7 @@ gridExtra::grid.arrange(
         geom_path(aes(y = (ontime - early) / vlate * 100),
             color = "#1c9c1c", lwd = 2) + 
         geom_path(aes(y = early / vlate * 100),
-            color = "#6387ef", lwd = 2) +
+            color = "#3c42a5", lwd = 2) +
         ylim(0, 100) + xlim(5, 24) +
         xlab("Time (hour)") + ylab("Percent of buses"),
     ncol = 2)
@@ -100,10 +100,11 @@ gridExtra::grid.arrange(
 
 ## How does this compare?
 
-* data from April through November 2017
-* average percentage of buses <strong class='early'>early</strong>, 
+* comparing __today__ with the average __`r format(Sys.Date(), '%A')`__<br>
+during April through November 2017
+* average number/percentage of buses <strong class='early'>early</strong>, 
   <strong class='ontime'>ontime</strong>, or <strong class='late'>late</strong>
-```{r averages, message=FALSE, warning=FALSE, error=FALSE,fig.height=4,fig.width=12}
+```{r averages, message=FALSE, warning=FALSE, error=FALSE,fig.height=3,fig.width=10}
 Nyear <- Nhist %>%
     filter(date >= '2017-04-01' & date < '2017-12-01' & 
            !format(date, '%a') %in% c('Sat', 'Sun')) %>%
@@ -116,22 +117,41 @@ Nyear <- Nyear %>%
     filter(dateMax[Nyear$date %>% as.character] > 730)
 Nlatest$dow <- factor(format(Nlatest$date, "%A"), levels = levels(Nyear$dow))
 Nday$dow <- factor(format(Nday$date, "%A"), levels = levels(Nyear$dow))
-ggplot(Nyear, aes(x = time)) + 
-    # geom_point(aes(y = vlate), color = "#d3540005") + 
-    # geom_point(aes(y = ontime), color = "#1c9c1c05") +
-    geom_smooth(aes(y = (vlate - ontime) / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#d35400") +
-    geom_smooth(aes(y = (ontime - early) / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#1c9c1c") +
-    geom_smooth(aes(y = early / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#6387ef") +
-    geom_point(aes(y = (vlate - ontime) / vlate * 100), data = Nlatest, color="#d35400", size = 2, stroke=2, pch = 4) +
-    geom_point(aes(y = (ontime - early) / vlate * 100), data = Nlatest, color="#1c9c1c", size = 2, stroke=2, pch = 4) +
-    geom_point(aes(y = early / vlate * 100), data = Nlatest, color="#6387ef", size = 2, stroke=2, pch = 4) +
-    # geom_path(aes(y = vlate), data = Nday, color = "#d35400", lty = 2) +
-    # geom_path(aes(y = ontime), data = Nday, color = "#1c9c1c", lty = 2) + 
-    # geom_path(aes(y = early), data = Nday, color = "#6387ef", lty = 2) +
-    facet_grid(~dow) +
-    xlab("Time (hour)") + ylab("Percent of buses") + ylim(0, 100)
+
+gridExtra::grid.arrange(
+    ggplot(Nyear %>% filter(dow == format(Sys.Date(), '%A')), aes(x = time)) + 
+        geom_smooth(aes(y = vlate), 
+            span = 0.1, method='loess', se=FALSE, color="#d35400", lty = 2) +
+        geom_smooth(aes(y = ontime), 
+            span = 0.1, method='loess', se=FALSE, color="#1c9c1c", lty = 2) +
+        geom_smooth(aes(y = early), 
+            span = 0.1, method='loess', se=FALSE, color="#3c42a5", lty = 2) +
+        geom_area(aes(y = vlate), data = Nday, 
+            fill="#d35400", size = 2, stroke=2, pch = 4, alpha = 0.6) +
+        geom_area(aes(y = ontime), data = Nday, 
+            fill="#1c9c1c", size = 2, stroke=2, pch= 4, alpha = 0.6) +
+        geom_area(aes(y = early), data = Nday, 
+            fill="#3c42a5", size = 2, stroke=2, pch = 4, alpha = 0.6) +
+        xlab("Time (hour)") + ylab("Number of buses"),
+    ggplot(Nyear %>% filter(dow == format(Sys.Date(), '%A')), aes(x = time)) + 
+        geom_smooth(aes(y = (vlate - ontime) / vlate * 100), 
+            span = 0.1, method='loess', se=FALSE, color="#d35400", lty = 2) +
+        geom_smooth(aes(y = (ontime - early) / vlate * 100), 
+            span = 0.1, method='loess', se=FALSE, color="#1c9c1c", lty = 2) +
+        geom_smooth(aes(y = early / vlate * 100), 
+            span = 0.1, method='loess', se=FALSE, color="#3c42a5", lty = 2) +
+        geom_path(aes(y = (vlate - ontime) / vlate * 100), data = Nday,
+            color="#d35400", size = 2, stroke=2, pch = 4, alpha = 0.7) +
+        geom_path(aes(y = (ontime - early) / vlate * 100), data = Nday, 
+            color="#1c9c1c", size = 2, stroke=2, pch = 4, alpha = 0.7) +
+        geom_path(aes(y = early / vlate * 100), data = Nday, 
+            color="#3c42a5", size = 2, stroke=2, pch = 4, alpha = 0.7) +
+        xlab("Time (hour)") + ylab("Percent of buses") + ylim(0, 100),
+    nrow = 1
+)
 ```
-* crosses show current values (as of `r tlatest`)
+* Expecting AT to deploy __more buses__ to meet demand
+* Could see higher proportion of <strong class='late'>late buses</strong> during March
 
 
 ## March Madness so far: % on-time
@@ -158,23 +178,23 @@ ggplot(mm, aes(x = time)) +
     geom_path(aes(y = (ontime - early) / vlate * 100), lwd = 1,
         color = "#1c9c1c", data = mm) + # %>% filter(week != "2017 Average")) + 
     geom_path(aes(y = early / vlate * 100), lwd = 1,
-        color = "#6387ef", data = mm) + # %>% filter(week != "2017 Average")) +
+        color = "#3c42a5", data = mm) + # %>% filter(week != "2017 Average")) +
     # geom_smooth(aes(y = (vlate - ontime) / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#d35400") +
     # geom_smooth(aes(y = (ontime - early) / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#1c9c1c") +
-    # geom_smooth(aes(y = early / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#6387ef") +
+    # geom_smooth(aes(y = early / vlate * 100), span = 0.1, method='loess', se=FALSE, color="#3c42a5") +
     geom_smooth(aes(y = (vlate - ontime) / vlate * 100), data = Nyearavg2,
         span = 0.1, method='loess', se=FALSE, color="#d3540070", lty = 2, lwd = 0.5) +
     geom_smooth(aes(y = (ontime - early) / vlate * 100), data = Nyearavg2,
         span = 0.1, method='loess', se=FALSE, color="#1c9c1c70", lty = 2, lwd = 0.5) +
     geom_smooth(aes(y = early / vlate * 100), data = Nyearavg2,
-        span = 0.1, method='loess', se=FALSE, color="#6387ef70", lty = 2, lwd = 0.5) +
+        span = 0.1, method='loess', se=FALSE, color="#3c42a570", lty = 2, lwd = 0.5) +
     facet_grid(week~dow, drop = FALSE) +
     xlab("Time (hour)") + ylab("Percent of buses") + ylim(0, 100)
 ```
 
 * percentage of buses <strong class='early'>early</strong>, 
 <strong class='ontime'>ontime</strong>, or <strong class='late'>late</strong>
-
+* dashed lines are day-of-week averages for 2017
 
 
 ## But just _how_ late (or early)?
@@ -230,9 +250,16 @@ gridExtra::grid.arrange(p1, p2, heights = c(6, 1))
 <span class='q50'>50%</span> of buses
 
 
-## March Madness so far: delays
+## Comparing today's delays
 
-```{r mmsofarQ, message=FALSE, warning=FALSE, error=FALSE,fig.height=5,fig.width=9}
+* comparing __today__ with the average __`r format(Sys.Date(), '%A')`__<br>
+during April through November 2017
+* average distribution of delays (<span class='early'>blue lines</span>)
+* coloured regions contain
+<span class='q90'>90%</span>,
+<span class='q75'>75%</span>, and
+<span class='q50'>50%</span> of buses
+```{r todayQ, message=FALSE, warning=FALSE, error=FALSE,fig.height=3.5,fig.width=6,fig.align='center'}
 Qyear <- Qhist %>%
     filter(date >= '2017-04-01' & date < '2017-12-01' & 
            !format(date, '%a') %in% c('Sat', 'Sun')) %>%
@@ -255,22 +282,52 @@ mmq <- Qhist %>%
                         labels = paste('Week', 1:5)))
 Qyearavg2 <- Qyearavg %>% 
     select(zero, q5, q125, q25, q75, q875, q95, time, dow)
+Qyearday <- Qyearavg2 %>% 
+    filter(dow == format(Sys.Date(), '%A'))
+Qday <- Qhist %>% 
+    filter(date == Sys.Date())
+ggplot(Qday, aes(x = time)) +
+    geom_smooth(aes(y = q5), data = Qyearday,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 3, lwd = 0.5) +    
+    geom_smooth(aes(y = q95), data = Qyearday,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 3, lwd = 0.5) +
+    geom_smooth(aes(y = q125), data = Qyearday,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 2, lwd = 0.5) +    
+    geom_smooth(aes(y = q875), data = Qyearday,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 2, lwd = 0.5) +
+    geom_smooth(aes(y = q25), data = Qyearday,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 1, lwd = 0.5) +    
+    geom_smooth(aes(y = q75), data = Qyearday,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 1, lwd = 0.5) +
+    geom_ribbon(aes(ymin = q5, ymax = q95), fill = "#bd9218", alpha=0.8) + 
+    geom_ribbon(aes(ymin = q125, ymax = q875), fill = "#914507", alpha=0.8) + 
+    geom_ribbon(aes(ymin = q25, ymax = q75), fill = "#000000", alpha=0.8) + 
+    geom_hline(yintercept = 0, color='white', lwd = 0.3) +
+    xlab("Time (hour)") + ylab("Delay (minutes)")
+```
+* if buses are later than usual, shaded region will be __higher__ 
+than corresponding <span class='early'>historical averages</span>
+
+
+## March Madness so far: delays
+
+```{r mmsofarQ, message=FALSE, warning=FALSE, error=FALSE,fig.height=5,fig.width=9}
 ggplot(mmq, aes(x = time)) +
     # geom_ribbon(aes(ymin = q5, ymax = q95), data = Qyearavg2, fill = "#bd921820") + 
     # geom_ribbon(aes(ymin = q125, ymax = q875), data = Qyearavg2, fill = "#91450720") + 
     # geom_ribbon(aes(ymin = q25, ymax = q75), data = Qyearavg2, fill = "#00000020") + 
     geom_smooth(aes(y = q5), data = Qyearavg2,
-        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 3, lwd = 0.5) +    
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 3, lwd = 0.5) +    
     geom_smooth(aes(y = q95), data = Qyearavg2,
-        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 3, lwd = 0.5) +
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 3, lwd = 0.5) +
     geom_smooth(aes(y = q125), data = Qyearavg2,
-        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 2, lwd = 0.5) +    
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 2, lwd = 0.5) +    
     geom_smooth(aes(y = q875), data = Qyearavg2,
-        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 2, lwd = 0.5) +
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 2, lwd = 0.5) +
     geom_smooth(aes(y = q25), data = Qyearavg2,
-        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 1, lwd = 0.5) +    
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 1, lwd = 0.5) +    
     geom_smooth(aes(y = q75), data = Qyearavg2,
-        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 1, lwd = 0.5) +
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 1, lwd = 0.5) +
     geom_ribbon(aes(ymin = q5, ymax = q95), fill = "#bd9218", alpha=0.8) + 
     geom_ribbon(aes(ymin = q125, ymax = q875), fill = "#914507", alpha=0.8) + 
     geom_ribbon(aes(ymin = q25, ymax = q75), fill = "#000000", alpha=0.8) + 
@@ -283,7 +340,7 @@ ggplot(mmq, aes(x = time)) +
 <span class='q90'>90%</span>,
 <span class='q75'>75%</span>, and
 <span class='q50'>50%</span> of buses
-* <span style='color: #2c7aaa'>historical averages</span>
+* compared to <span style='color: #2c7aaa'>historical averages</span>
 
 ***
 
