@@ -296,7 +296,7 @@ window.onload = function(e) {
     Reveal.addEventListener('slidechanged', function( event ) {
         if (Reveal.isLastSlide()) {
             setTimeout(function() {
-                window.location = 'https://stat.auckland.ac.nz/~tell029/pi-displays/march_madness.html';
+                window.location = 'http://tomelliott.co.nz/realtimebuses/mamarch.html';
             }, 20000);
         }
     });
