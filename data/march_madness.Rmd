@@ -1,7 +1,7 @@
 ---
 title: "March Madness"
-author: "Tracking Auckland's bus delays through it's busiest month"
-date: "Based on real-time data, updated approximately every 30 minutes"
+author: "Tracking Auckland's bus delays<br>through its busiest month"
+date: "Based on historical and real-time data, updated approximately every 30 minutes,<br>obtained from Auckland Transport's public GTFS API"
 output: 
     revealjs::revealjs_presentation:
         css: march.css
@@ -12,7 +12,7 @@ output:
 ---
 
 ```{r,echo=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE,error=FALSE)
 ```
 
 ```{r setup,results='hide',message=FALSE}
@@ -20,27 +20,49 @@ source('makeplots.R')
 load('~/Dropbox/gtfs/delayhistory.rda')
 ```
 
-## What is "March Madess"?
+## What is "March Madness"?
 
 - Busiest month of the year for public transport
 - Buses, trains at capacity
-- Officially starts February 26, when students surge back into the CBD
+- __Industrial action__: fewer trains during peak, which could increase
+bus demand
+- Starts February 26, when students surge into the CBD
 
-<!--
-## How are we doing so far?
+- __The data__: 
+    - real-time delays from buses
+    - historical data from April through November 2017 for comparison
 
-```{r marchsofar, message=FALSE, warning=FALSE, error=FALSE, fig.height=6, fig.width=10}
-## makePlots(c("2018-02-26" %>% as.Date, "2018-03-31" %>% as.Date))
-makePlots(c("2018-02-01" %>% as.Date, "2018-03-31" %>% as.Date))
+
+## What does a typical day look like?
+
+```{r ngraph,fig.height=3,fig.width=7}
+Nhist %>% filter(date == "2018-02-19") %>%
+    ggplot(aes(x = time)) + 
+        geom_area(aes(y = vlate), fill = "#d35400") +
+        # geom_area(aes(y = late), fill = "orange") +
+        geom_area(aes(y = ontime), fill = "#1c9c1c") + 
+        geom_area(aes(y = early), fill = "#6387ef") +
+        # geom_area(aes(y = vearly), fill = "#bb0000") +
+        xlim(5, 24) +
+        xlab("Time (hour)") + ylab("Number of buses") +
+        geom_label(aes(x = 8.25, y = 950, label = 'A')) +
+        geom_label(aes(x = 15.75, y = 850, label = 'B')) +
+        geom_label(aes(x = 17.75, y = 850, label = 'C'))
 ```
--->
+
+* Peak periods: __A__ morning, __B__ school, __C__ evening
+* The coloured areas represent the proportion<br> of buses that are
+    - <span class='early'>more than 5 minutes early</span>
+    - <span class='ontime'>on time (within 5 minutes of schedule)</span>
+    - <span class='late'>late by more than 5 minutes</span>
+
 
 ```{r latest_ontime}
 Nlatest <- Nhist[nrow(Nhist), ]
 Qlatest <- Qhist[nrow(Qhist), ]
 tcur <- Nlatest$time
 tlatest <- paste0(floor(tcur) - ifelse(tcur >= 13, 12, 0), 
-                  ":", (tcur %% 1) * 60, " ",
+                  ":", sprintf("%02d", round((tcur %% 1) * 60)), " ",
                   ifelse(floor(tcur) < 12, "am", "pm"))
 total <- Nlatest$vlate
 early <- Nlatest$early
@@ -57,15 +79,23 @@ late <- total - ontime - early
 ```{r todaytrace, message=FALSE, warning=FALSE, error=FALSE, fig.height=3,fig.width=10}
 Nday <- Nhist %>% 
     filter(Nhist$date == Sys.Date())
-ggplot(Nday, aes(x = time)) + 
-    geom_path(aes(y = (vlate - ontime) / vlate * 100),
-        color = "#d35400", lwd = 2) +
-    geom_path(aes(y = (ontime - early) / vlate * 100),
-        color = "#1c9c1c", lwd = 2) + 
-    geom_path(aes(y = early / vlate * 100),
-        color = "#6387ef", lwd = 2) +
-    ylim(0, 100) + xlim(5, 24) +
-    xlab("Time (hour)") + ylab("Percent of buses")
+gridExtra::grid.arrange(
+    ggplot(Nday, aes(x = time)) + 
+        geom_area(aes(y = vlate), fill = "#d35400") +
+        geom_area(aes(y = ontime), fill = "#1c9c1c") + 
+        geom_area(aes(y = early), fill = "#6387ef") +
+        xlim(5, 24) +
+        xlab("Time (hour)") + ylab("Number of buses"),
+    ggplot(Nday, aes(x = time)) + 
+        geom_path(aes(y = (vlate - ontime) / vlate * 100),
+            color = "#d35400", lwd = 2) +
+        geom_path(aes(y = (ontime - early) / vlate * 100),
+            color = "#1c9c1c", lwd = 2) + 
+        geom_path(aes(y = early / vlate * 100),
+            color = "#6387ef", lwd = 2) +
+        ylim(0, 100) + xlim(5, 24) +
+        xlab("Time (hour)") + ylab("Percent of buses"),
+    ncol = 2)
 ```
 
 ## How does this compare?
@@ -104,7 +134,7 @@ ggplot(Nyear, aes(x = time)) +
 * crosses show current values (as of `r tlatest`)
 
 
-## March Madess: % on-time
+## March Madness so far: % on-time
 
 ```{r mmsofar, message=FALSE, warning=FALSE, error=FALSE,fig.height=5,fig.width=9}
 Nyearavg <- Nyear %>%
@@ -200,9 +230,9 @@ gridExtra::grid.arrange(p1, p2, heights = c(6, 1))
 <span class='q50'>50%</span> of buses
 
 
-## March Madness: delays
+## March Madness so far: delays
 
-```{r mmsofarQ, message=FALSE, warning=FALSE, error=FALSE,fig.height=4.5,fig.width=10}
+```{r mmsofarQ, message=FALSE, warning=FALSE, error=FALSE,fig.height=5,fig.width=9}
 Qyear <- Qhist %>%
     filter(date >= '2017-04-01' & date < '2017-12-01' & 
            !format(date, '%a') %in% c('Sat', 'Sun')) %>%
@@ -226,24 +256,25 @@ mmq <- Qhist %>%
 Qyearavg2 <- Qyearavg %>% 
     select(zero, q5, q125, q25, q75, q875, q95, time, dow)
 ggplot(mmq, aes(x = time)) +
-    # geom_smooth(aes(y = q5), data = Qyearavg2,
-    #     span = 0.1, method='loess', se=FALSE, color="#bd9218", lty = 2, lwd = 0.5) +    
-    # geom_smooth(aes(y = q95), data = Qyearavg2,
-    #     span = 0.1, method='loess', se=FALSE, color="#bd9218", lty = 2, lwd = 0.5) +
-    # geom_smooth(aes(y = q125), data = Qyearavg2,
-    #     span = 0.1, method='loess', se=FALSE, color="#914507", lty = 2, lwd = 0.5) +    
-    # geom_smooth(aes(y = q875), data = Qyearavg2,
-    #     span = 0.1, method='loess', se=FALSE, color="#914507", lty = 2, lwd = 0.5) +
-    # geom_smooth(aes(y = q25), data = Qyearavg2,
-    #     span = 0.1, method='loess', se=FALSE, color="black", lty = 2, lwd = 0.5) +    
-    # geom_smooth(aes(y = q75), data = Qyearavg2,
-    #     span = 0.1, method='loess', se=FALSE, color="black", lty = 2, lwd = 0.5) +
-    geom_ribbon(aes(ymin = q5, ymax = q95), data = Qyearavg2, fill = "#bd921820") + 
-    geom_ribbon(aes(ymin = q125, ymax = q875), data = Qyearavg2, fill = "#91450720") + 
-    geom_ribbon(aes(ymin = q25, ymax = q75), data = Qyearavg2, fill = "#00000020") + 
-    geom_ribbon(aes(ymin = q5, ymax = q95), fill = "#bd9218") + 
-    geom_ribbon(aes(ymin = q125, ymax = q875), fill = "#914507") + 
-    geom_ribbon(aes(ymin = q25, ymax = q75), fill = "#000000") + 
+    # geom_ribbon(aes(ymin = q5, ymax = q95), data = Qyearavg2, fill = "#bd921820") + 
+    # geom_ribbon(aes(ymin = q125, ymax = q875), data = Qyearavg2, fill = "#91450720") + 
+    # geom_ribbon(aes(ymin = q25, ymax = q75), data = Qyearavg2, fill = "#00000020") + 
+    geom_smooth(aes(y = q5), data = Qyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 3, lwd = 0.5) +    
+    geom_smooth(aes(y = q95), data = Qyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 3, lwd = 0.5) +
+    geom_smooth(aes(y = q125), data = Qyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 2, lwd = 0.5) +    
+    geom_smooth(aes(y = q875), data = Qyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 2, lwd = 0.5) +
+    geom_smooth(aes(y = q25), data = Qyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 1, lwd = 0.5) +    
+    geom_smooth(aes(y = q75), data = Qyearavg2,
+        span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 1, lwd = 0.5) +
+    geom_ribbon(aes(ymin = q5, ymax = q95), fill = "#bd9218", alpha=0.8) + 
+    geom_ribbon(aes(ymin = q125, ymax = q875), fill = "#914507", alpha=0.8) + 
+    geom_ribbon(aes(ymin = q25, ymax = q75), fill = "#000000", alpha=0.8) + 
+    geom_hline(yintercept = 0, color='white', lwd = 0.3) +
     facet_grid(week~dow, drop = FALSE) +
     xlab("Time (hour)") + ylab("Delay (minutes)")
 ```
@@ -252,11 +283,13 @@ ggplot(mmq, aes(x = time)) +
 <span class='q90'>90%</span>,
 <span class='q75'>75%</span>, and
 <span class='q50'>50%</span> of buses
-* faded parts based on historical averages,<br>
-from April through November 2017
-
+* <span style='color: #2c7aaa'>historical averages</span>
 
 ***
+
+View the slides here:
+
+<span class='bigN'>bit.ly/madmarch18</span>
 
 <script>
 window.onload = function(e) {
@@ -264,7 +297,7 @@ window.onload = function(e) {
         if (Reveal.isLastSlide()) {
             setTimeout(function() {
                 window.location = 'https://stat.auckland.ac.nz/~tell029/pi-displays/march_madness.html';
-            }, 5000);
+            }, 20000);
         }
     });
 };

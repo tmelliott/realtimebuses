@@ -5,10 +5,12 @@
 
 }
 .reveal section h3.date {
-    margin-top: 50vh;
+    margin-top: 300px;
     font-size: 24px;
 }
-
+.reveal section h1:not(.title) {
+    font-size: 1.6em;
+}
 
 .reveal section img {
     border: none;
