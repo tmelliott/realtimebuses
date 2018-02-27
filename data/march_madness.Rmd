@@ -353,7 +353,7 @@ View the slides here:
 window.onload = function(e) {
     var timer;
     Reveal.addEventListener('slidechanged', function( event ) {
-        if (Reveal.isLastSlide()) {
+        if (1===2 && Reveal.isLastSlide()) {
             timer = setTimeout(function() {
                 window.location = 'http://tomelliott.co.nz/realtimebuses/madmarch.html';
             }, 20000);
