@@ -1,6 +1,6 @@
 ---
 title: "The State of Auckland's Buses"
-author: "A visual overview of the performance of buses in the Auckland Transport network"
+author: "A visual overview of the performance of buses in the Auckland transport network"
 date: "Based on historical and real-time data, updated approximately every 30 minutes,<br>obtained from Auckland Transport's public GTFS API"
 output: 
     revealjs::revealjs_presentation:
@@ -12,11 +12,14 @@ output:
             # autoSlide: 30000
 ---
 
-```{r,echo=FALSE}
-knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE,error=FALSE)
+
+```{r setup, echo=FALSE, results='hide'}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE, error=FALSE)
 ```
 
-```{r setup,results='hide',message=FALSE}
+## Real-time and historical bus data
+
+```{r load_stuff, results='hide'}
 library(lubridate)
 source('makeplots.R')
 load('~/Dropbox/gtfs/delayhistory.rda')
@@ -29,6 +32,7 @@ colpal2 <- list(q50 = palfun2()[1],
                 q75 = palfun2()[2],
                 q90 = palfun2()[3])
 ```
+
 <style>
 .reveal section .late {
     color: `r colpal$late`;
@@ -50,7 +54,6 @@ colpal2 <- list(q50 = palfun2()[1],
 }
 </style>
 
-## Real-time and historical bus data
 
 - Using the public GTFS API provided by Auckland Transport, we obtain &hellip;
     - <strong>GPS positions</strong> (= position on a map), and
@@ -103,7 +106,7 @@ late <- total - ontime - early
 * <span class='bigN late'>`r late`</span> were running more than 5 minutes late
 * <span class='bigN early'>`r early`</span> were more than 5 minutes early
 
-```{r todaytrace, message=FALSE, warning=FALSE, error=FALSE, fig.height=3,fig.width=10}
+```{r todaytrace,fig.height=3,fig.width=10}
 Nday <- Nhist %>% 
     filter(Nhist$date == Sys.Date())
 gridExtra::grid.arrange(
@@ -125,11 +128,11 @@ gridExtra::grid.arrange(
     ncol = 2)
 ```
 
-## Comparing today with past 10 `r format(today(), '%A')`s
+## Today vs. last 10 `r format(today(), '%A')`s
 
 * number and percentage of buses <strong class='early'>early</strong>, 
   <strong class='ontime'>ontime</strong>, or <strong class='late'>late</strong>
-```{r numbersHist, message=FALSE, warning=FALSE, error=FALSE,fig.height=2.8,fig.width=10}
+```{r numbersHist, fig.height=2.8, fig.width=10}
 Nyear <- Nhist %>%
     filter(date >= today() - weeks(10) & date < today()) %>%
     mutate(dow = factor(format(date, '%A'),
@@ -159,7 +162,7 @@ gridExtra::grid.arrange(
 )
 ```
 - comparing __average__ (dashed) of past Thursdays with today
-```{r averages, message=FALSE, warning=FALSE, error=FALSE,fig.height=2.8,fig.width=10}
+```{r averages, fig.height=2.8, fig.width=10}
 gridExtra::grid.arrange(
     ggplot(Nyear %>% filter(dow == format(Sys.Date(), '%A')), aes(x = time)) + 
         geom_area(aes(y = vlate), data = Nday, 
@@ -194,9 +197,9 @@ gridExtra::grid.arrange(
 ```
 
 
-## This week versus last 4 weeks
+## This week vs. last 4 weeks
 
-```{r mmsofar, message=FALSE, warning=FALSE, error=FALSE,fig.height=5.5,fig.width=9}
+```{r mmsofar, fig.height=5.5, fig.width=9}
 Monday <- today() - days(as.numeric(format(today(), "%u")) - 1)
 mm <- Nhist %>%
     filter(date >= Monday - weeks(4) & date <= today()) %>%
@@ -233,7 +236,7 @@ tobs <- as.POSIXct(pb$header$timestamp, origin = "1970-01-01")
 ```
 
 * Each dot represents one vehicle's delay at `r format(tobs, '%l:%M %p')`
-```{r nowdelays, message=FALSE, warning=FALSE, error=FALSE,fig.height=5,fig.width=10}
+```{r nowdelays, fig.height=5, fig.width=10}
 delays <- data.frame(
     delay = sapply(pb$entity, function(x) {
         stu <- x$trip_update$stop_time_update[[1]]
@@ -274,120 +277,108 @@ gridExtra::grid.arrange(p1, p2, heights = c(6, 1))
 
 ## Delays so far today
 
-- rotating the bar from the previous graph, we see how the distribution of delays has changed today
-```{r delayToday,fig.height=4,fig.width=8,fig.align='center'}
+```{r delayToday,fig.height=5,fig.width=10,fig.align='center'}
 Qday <- Qhist %>% 
     filter(date == Sys.Date())
  ggplot(Qday, aes(x = time)) +
-    # geom_ribbon(aes(ymin = q5, ymax = q95), fill = colpal2$q90) + 
-    # geom_ribbon(aes(ymin = q125, ymax = q875), fill = colpal2$q75) + 
-    # geom_ribbon(aes(ymin = q25, ymax = q75), fill = colpal2$q50) + 
-    geom_linerange(aes(ymin = q5, ymax = q95), color = colpal2$q90, lwd = 2) + 
-    geom_linerange(aes(ymin = q125, ymax = q875), color = colpal2$q75, lwd = 2) + 
-    geom_linerange(aes(ymin = q25, ymax = q75), color = colpal2$q50, lwd = 2) + 
-    # geom_hline(yintercept = 0, color='white', lwd = 0.3) +
+    geom_linerange(aes(ymin = q5, ymax = q95), color = colpal2$q90, lwd = 4) + 
+    geom_linerange(aes(ymin = q125, ymax = q875), color = colpal2$q75, lwd = 4) + 
+    geom_linerange(aes(ymin = q25, ymax = q75), color = colpal2$q50, lwd = 4) + 
     xlab("Time (hour)") + ylab("Delay (minutes)") + 
-    xlim(min(Qhist$time), max(Qhist$time)) + ylim(-20, 30)
+    xlim(min(Qhist$time), max(Qhist$time)) + ylim(-15, 30)
 ```
 
+* rotating the bar from the previous graph, we see how the distribution of delays has changed today
 
-## Comparing today with past 10 `r format(today(), '%A')`s
 
-* 
-* average distribution of delays (<span class='early'>blue lines</span>)
-* coloured regions contain
-<span class='q90'>90%</span>,
-<span class='q75'>75%</span>, and
-<span class='q50'>50%</span> of buses
-```{r todayQ, message=FALSE, warning=FALSE, error=FALSE,fig.height=3.5,fig.width=6,fig.align='center'}
-# Qyear <- Qhist %>%
-#     filter(date >= '2017-04-01' & date < '2017-12-01' & 
-#            !format(date, '%a') %in% c('Sat', 'Sun')) %>%
-#     mutate(dow = factor(format(date, '%A'),
-#                         levels = c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 
-#                                    'Friday')))
-# ## Filter out Mon-Fri with max less than 400
-# Qyear <- Qyear %>%
-#     filter(dateMax[Qyear$date %>% as.character] > 730)
-# Qyearavg <- Qyear %>% mutate(week = 0)
-# mmq <- Qhist %>%
-#     filter(date >= '2018-02-26' & date < '2018-04-01' &
-#            !format(date, '%a') %in% c('Sat', 'Sun')) %>%
-#     mutate(dow = factor(format(date, '%A'),
-#                         levels = c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 
-#                                    'Friday')),
-#            week = (format(date, '%W') %>% as.numeric) - 8) %>%
-#     select(zero, q5, q125, q25, q75, q875, q95, time, dow, week) %>%
-#     mutate(week = factor(week, levels = 1:5, 
-#                         labels = paste('Week', 1:5)))
-# Qyearavg2 <- Qyearavg %>% 
-#     select(zero, q5, q125, q25, q75, q875, q95, time, dow)
-# Qyearday <- Qyearavg2 %>% 
-#     filter(dow == format(Sys.Date(), '%A'))
-# Qday <- Qhist %>% 
-#     filter(date == Sys.Date())
-# ggplot(Qday, aes(x = time)) +
-#     geom_smooth(aes(y = q5), data = Qyearday,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 3, lwd = 0.5) +    
-#     geom_smooth(aes(y = q95), data = Qyearday,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 3, lwd = 0.5) +
-#     geom_smooth(aes(y = q125), data = Qyearday,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 2, lwd = 0.5) +    
-#     geom_smooth(aes(y = q875), data = Qyearday,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 2, lwd = 0.5) +
-#     geom_smooth(aes(y = q25), data = Qyearday,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 1, lwd = 0.5) +    
-#     geom_smooth(aes(y = q75), data = Qyearday,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", lty = 1, lwd = 0.5) +
-#     geom_ribbon(aes(ymin = q5, ymax = q95), fill = "#bd9218", alpha=0.8) + 
-#     geom_ribbon(aes(ymin = q125, ymax = q875), fill = "#914507", alpha=0.8) + 
-#     geom_ribbon(aes(ymin = q25, ymax = q75), fill = "#000000", alpha=0.8) + 
-#     geom_hline(yintercept = 0, color='white', lwd = 0.3) +
-#     xlab("Time (hour)") + ylab("Delay (minutes)")
+## Today vs. last 10 `r format(today(), '%A')`s
+
+```{r todayQ, fig.height=5, fig.width=10, fig.align='center'}
+Qweeks <- Qhist %>%
+    filter(date >= today() - weeks(10) & date < today()) %>%
+    mutate(dow = factor(format(date, '%A'),
+                        levels = c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 
+                                   'Friday', 'Saturday', 'Sunday')))
+Qdow <- Qweeks %>% filter(dow == format(today(), "%A"))
+halpha <- 0.5
+ggplot(Qdow, aes(x = time)) +
+    geom_line(aes(y = q5, group = date),
+        color=colpal2$q90, lty = 4, lwd = 0.5, alpha = halpha) +    
+    geom_line(aes(y = q95, group = date),
+        color=colpal2$q90, lty = 4, lwd = 0.5, alpha = halpha) +
+    geom_line(aes(y = q125, group = date),
+        color=colpal2$q75, lty = 2, lwd = 0.5, alpha = halpha) +    
+    geom_line(aes(y = q875, group = date),
+        color=colpal2$q75, lty = 2, lwd = 0.5, alpha = halpha) +
+    geom_line(aes(y = q25, group = date),
+        color=colpal2$q50, lty = 1, lwd = 0.5, alpha = halpha) +    
+    geom_line(aes(y = q75, group = date),
+        color=colpal2$q50, lty = 1, lwd = 0.5, alpha = halpha) +
+    ## today line
+    geom_line(aes(y = q5), data = Qhist %>% filter(date == today()),
+        color="black", lty = 4, lwd = 1) +    
+    geom_line(aes(y = q95), data = Qhist %>% filter(date == today()),
+        color="black", lty = 4, lwd = 1) +
+    geom_line(aes(y = q125), data = Qhist %>% filter(date == today()),
+        color="black", lty = 2, lwd = 1) +    
+    geom_line(aes(y = q875), data = Qhist %>% filter(date == today()),
+        color="black", lty = 2, lwd = 1) +
+    geom_line(aes(y = q25), data = Qhist %>% filter(date == today()),
+        color="black", lty = 1, lwd = 1) +    
+    geom_line(aes(y = q75), data = Qhist %>% filter(date == today()),
+        color="black", lty = 1, lwd = 1) +
+    # geom_linerange(aes(ymin = q5, ymax = q95), 
+    #     data = Qhist %>% filter(date == today()),
+    #     color = colpal2$q90, lwd = 2) + 
+    # geom_linerange(aes(ymin = q125, ymax = q875), 
+    #     data = Qhist %>% filter(date == today()),
+    #     color = colpal2$q75, lwd = 2) + 
+    # geom_linerange(aes(ymin = q25, ymax = q75), 
+    #     data = Qhist %>% filter(date == today()),
+    #     color = colpal2$q50, lwd = 2) + 
+    # geom_hline(yintercept = 0, color='white', lwd = 0.3) +
+    xlab("Time (hour)") + ylab("Delay (minutes)") + ylim(-15, 30)
 ```
-* if buses are later than usual, shaded region will be __higher__ 
-than corresponding <span class='early'>historical averages</span>
+
+* coloured lines represent the
+<span class='q90'>5% and 95%</span>,
+<span class='q75'>12.5% and 87.5%</span>, and
+<span class='q50'>25% and 75%</span> quantiles of bus delays 
 
 
-## March Madness so far: delays
+## This week vs. last 4 weeks
 
-```{r mmsofarQ, message=FALSE, warning=FALSE, error=FALSE,fig.height=5,fig.width=9}
-# ggplot(mmq, aes(x = time)) +
-#     # geom_ribbon(aes(ymin = q5, ymax = q95), data = Qyearavg2, fill = "#bd921820") + 
-#     # geom_ribbon(aes(ymin = q125, ymax = q875), data = Qyearavg2, fill = "#91450720") + 
-#     # geom_ribbon(aes(ymin = q25, ymax = q75), data = Qyearavg2, fill = "#00000020") + 
-#     geom_smooth(aes(y = q5), data = Qyearavg2,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 3, lwd = 0.5) +    
-#     geom_smooth(aes(y = q95), data = Qyearavg2,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 3, lwd = 0.5) +
-#     geom_smooth(aes(y = q125), data = Qyearavg2,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 2, lwd = 0.5) +    
-#     geom_smooth(aes(y = q875), data = Qyearavg2,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 2, lwd = 0.5) +
-#     geom_smooth(aes(y = q25), data = Qyearavg2,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 1, lwd = 0.5) +    
-#     geom_smooth(aes(y = q75), data = Qyearavg2,
-#         span = 0.1, method='loess', se=FALSE, color="#2c7aaa", alpha=0.7, lty = 1, lwd = 0.5) +
-#     geom_ribbon(aes(ymin = q5, ymax = q95), fill = "#bd9218", alpha=0.8) + 
-#     geom_ribbon(aes(ymin = q125, ymax = q875), fill = "#914507", alpha=0.8) + 
-#     geom_ribbon(aes(ymin = q25, ymax = q75), fill = "#000000", alpha=0.8) + 
-#     geom_hline(yintercept = 0, color='white', lwd = 0.3) +
-#     facet_grid(week~dow, drop = FALSE) +
-#     xlab("Time (hour)") + ylab("Delay (minutes)")
+```{r mmsofarQ, fig.height=5.5, fig.width=9}
+mmq <- Qhist %>%
+    filter(date >= Monday - weeks(4) & date <= today()) %>%
+    mutate(dow = factor(format(date, '%A'),
+                        levels = c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 
+                                   'Friday', 'Saturday', 'Sunday')),
+           week = (format(date, '%W') %>% as.numeric) - format(Monday, '%W') %>% as.numeric) %>%
+    select(zero, q5, q125, q25, q75, q875, q95, time, date, dow, week) %>%
+    mutate(week = factor(week, levels = -4:-0,
+                         labels = c(paste(4:2, 'weeks ago'), "Last week", "This week")))
+
+ggplot(mmq, aes(x = time)) +
+    geom_linerange(aes(ymin = q5, ymax = q95), color = colpal2$q90, lwd = 1) + 
+    geom_linerange(aes(ymin = q125, ymax = q875), color = colpal2$q75, lwd = 1) + 
+    geom_linerange(aes(ymin = q25, ymax = q75), color = colpal2$q50, lwd = 1) + 
+    facet_grid(week~dow, drop = FALSE) +
+    xlab("Time (hour)") + ylab("Delay (minutes)") + ylim(-15, 30)
 ```
 
 * the regions contain
 <span class='q90'>90%</span>,
 <span class='q75'>75%</span>, and
 <span class='q50'>50%</span> of buses
-* compared to <span style='color: #2c7aaa'>historical averages</span>
 
-***
 
+
+<!-- 
 View the slides here:
 
 <span class='bigN'>bit.ly/madmarch2018</span>
-
+ -->
 <script>
 window.onload = function(e) {
     var timer;
