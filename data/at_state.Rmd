@@ -9,7 +9,7 @@ output:
         reveal_options:
             controls: false
             loop: true
-            # autoSlide: 30000
+            autoSlide: 30000
 ---
 
 
