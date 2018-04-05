@@ -43,7 +43,7 @@ system(
 files <- unzip(tmp, exdir = tempdir())
 unlink(tmp)
 
-#unlink('data/history.db')
+pboptions(type = 'timer')
 invisible(pbapply::pbsapply(files, pb2db))
 
 ## copy to main table, removing duplicates in the process
