@@ -2,6 +2,8 @@ _site
 .idea
 node_modules
 
+*.db 
+
 *.Rdump
 *.csv
 *.log
