@@ -20,10 +20,11 @@ trip.delays <-
     collect() %>%
     mutate(time = as_datetime(as.POSIXct(time, origin = '1970-01-01')))
 
-ggplot(trip.delays, aes(x = time, y = delay)) +
+ggplot(trip.delays, aes(x = time, y = delay/60)) +
     geom_point(alpha = 0.5) +
-    ylim(-30 * 60, 30 * 60) +
-    geom_hline(yintercept = c(-60, 300), lty = 2, col = 'red')
+    ylim(-30, 30) +
+    xlab("Time") + ylab("Delay (min)") +
+    geom_hline(yintercept = c(-1, 5), lty = 2, col = 'red')
 
 ## peak vs offpeak ontimeness
 peak <- list(morning = c(7.5, 10),
@@ -47,8 +48,15 @@ tu <- trip_updates %>%
                             TRUE ~ '')) %>%
     filter(peak != '')
 
+tu %>% filter(delay > -20000 & stop_sequence < 85) %>%
+    group_by(peak) %>%
+    summarize(late = mean(ontime == 'late'),
+              early = mean(ontime == 'early'),
+              ontime = mean(ontime == 'ontime'))
+
+
 smry <- tu %>%
-    filter(delay > -20000 & stop_sequence < 85) %>%
+    filter(delay > -20000 & stop_sequence < 80) %>%
     group_by(peak, stop_sequence) %>%
     summarize(late = mean(ontime == 'late'),
               early = mean(ontime == 'early'),
