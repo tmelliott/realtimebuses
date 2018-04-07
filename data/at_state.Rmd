@@ -140,8 +140,8 @@ Nyear <- Nhist %>%
                                    'Friday', 'Saturday', 'Sunday')))
 ## Filter out Mon-Fri with max less than 400
 dateMax <- with(Nyear, tapply(vlate, date, max))
-Nyear <- Nyear %>%
-    filter(dateMax[Nyear$date %>% as.character] > 730)
+#Nyear <- Nyear %>%
+#    filter(dateMax[Nyear$date %>% as.character] > 730)
 Nlatest$dow <- factor(format(Nlatest$date, "%A"), levels = levels(Nyear$dow))
 Nday$dow <- factor(format(Nday$date, "%A"), levels = levels(Nyear$dow))
 
