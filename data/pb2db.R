@@ -3,6 +3,7 @@ library(RCurl)
 library(RSQLite)
 library(RProtoBuf)
 library(tidyverse)
+library(pbapply)
 readProtoFiles(dir = 'assets/protobuf')
 
 pb2db <- function(file, db = 'data/history.db') {
@@ -44,7 +45,7 @@ files <- unzip(tmp, exdir = tempdir())
 unlink(tmp)
 
 pboptions(type = 'timer')
-invisible(pbapply::pbsapply(files, pb2db))
+invisible(pbsapply(files, pb2db))
 
 ## copy to main table, removing duplicates in the process
 con <- dbConnect(SQLite(), "data/history.db")
