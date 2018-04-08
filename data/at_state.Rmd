@@ -243,6 +243,7 @@ delays <- data.frame(
         if (stu$has('arrival')) return (stu$arrival$delay)
         return (stu$departure$delay)
     })) %>%
+    filter(delay > -60*60 & delay < 60*60) %>%
     mutate(g = rep("delay", n()),
            delay = pmax(-20, pmin(30, delay / 60)))
 p1 <- ggplot(delays, aes(x = delay)) + 
