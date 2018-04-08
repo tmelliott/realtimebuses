@@ -56,7 +56,7 @@ dothedata <- function(DATES, overwrite = FALSE) {
                 }
                 return(NA)
             })
-            delays <- delays[!is.na(delays)]
+            delays <- delays[!is.na(delays) & delays > -60*60 & delays < 60*60]
             if (length(delays) > 0) {
               Nt <- integer(5)
               Nt[1] <- sum(delays < -10 * 60)
