@@ -4,10 +4,14 @@ library(RSQLite)
 library(tidyverse)
 library(dbplyr)
 library(lubridate)
+library(ggmap)
+library(viridis)
 
 db <- 'data/history.db'
 con <- dbConnect(SQLite(), db)
 trip_updates <- tbl(con, 'trip_updates')
+peak <- list(morning = c(6, 9.5),
+             evening = c(14.5, 19))
 
 ## average trip delay by trip (start) time
 trip.delays <-
@@ -18,17 +22,18 @@ trip.delays <-
               delay = mean(departure_delay, na.rm = TRUE)) %>%
     arrange(time) %>%
     collect() %>%
-    mutate(time = as_datetime(as.POSIXct(time, origin = '1970-01-01')))
+    mutate(timestamp = as.POSIXct(time, origin = '1970-01-01'),
+           time = as.numeric(format(timestamp, '%H')) +
+               as.numeric(format(timestamp, '%M')) / 60)
 
 ggplot(trip.delays, aes(x = time, y = delay/60)) +
     geom_point(alpha = 0.5) +
     ylim(-30, 30) +
     xlab("Time") + ylab("Delay (min)") +
-    geom_hline(yintercept = c(-1, 5), lty = 2, col = 'red')
+    geom_hline(yintercept = c(-1, 5), lty = 2, col = 'red') +
+    geom_vline(xintercept = do.call(c, peak), lty = 2, col = 'blue')
 
 ## peak vs offpeak ontimeness
-peak <- list(morning = c(7.5, 10),
-             evening = c(15, 19))
 
 tu <- trip_updates %>%
     select(timestamp, departure_delay, stop_sequence) %>%
@@ -39,7 +44,6 @@ tu <- trip_updates %>%
                               TRUE ~ 'ontime')) %>%
     collect() %>%
     mutate(timestamp = as.POSIXct(timestamp, origin = '1970-01-01'),
-           ##time = hour(timestamp) + minute(timestamp) / 60,
            time = as.numeric(format(timestamp, '%H')) +
                as.numeric(format(timestamp, '%M')) / 60,
            peak = case_when(between(time, peak$morning[1], peak$morning[2]) ~ 'morning peak',
@@ -51,23 +55,120 @@ tu <- trip_updates %>%
 tu %>% filter(delay > -20000 & stop_sequence < 85) %>%
     group_by(peak) %>%
     summarize(late = mean(ontime == 'late'),
+              late.n = sum(ontime == 'late'),
+              late.se = sqrt(late * (1 - late) / late.n),
               early = mean(ontime == 'early'),
-              ontime = mean(ontime == 'ontime'))
+              early.n = sum(ontime == 'early'),
+              early.se = sqrt(early * (1 - early) / early.n),
+              on.time = mean(ontime == 'ontime'),
+              on.time.n = sum(ontime == 'ontime'),
+              on.time.se = sqrt(on.time * (1 - on.time) / on.time.n))
 
 
 smry <- tu %>%
-    filter(delay > -20000 & stop_sequence < 80) %>%
+    filter(delay > -20000 & stop_sequence < 60) %>%
     group_by(peak, stop_sequence) %>%
     summarize(late = mean(ontime == 'late'),
+              late.n = sum(ontime == 'late'),
+              late.se = sqrt(late * (1 - late) / late.n),
               early = mean(ontime == 'early'),
-              ontime = mean(ontime == 'ontime'))
+              early.n = sum(ontime == 'early'),
+              early.se = sqrt(early * (1 - early) / early.n),
+              on.time = mean(ontime == 'ontime'),
+              on.time.n = sum(ontime == 'ontime'),
+              on.time.se = sqrt(on.time * (1 - on.time) / on.time.n)) %>%
+    ungroup() %>%
+    mutate(peak = as.factor(peak))
+smry
 
 p <- ggplot(smry, aes(x = stop_sequence, colour = peak)) +
-    ylim(0, 1) + xlab('Stop #') + labs(colour = '')
-p + geom_point(aes(y = ontime)) + ylab('% buses on time (1 min early - 5 min late)')
-p + geom_point(aes(y = late)) + ylab('% buses > 5min late')
-p + geom_point(aes(y = early)) + ylab('% buses > 1min early')
+    xlab('Stop #') + labs(colour = '') +
+    scale_y_continuous(labels = function(x) paste0(x * 100, '%'), limits = c(0, 1))
+pontime <- p + 
+    geom_errorbar(aes(ymin = on.time - on.time.se, ymax = on.time + on.time.se)) + 
+    ylab('On time (1 min early - 5 min late)')
+plate <- p + 
+    geom_errorbar(aes(ymin = late - late.se, ymax = late + late.se)) + 
+    ylab('Late by 5+ min')
+pearly <- p + 
+    geom_errorbar(aes(ymin = early - early.se, ymax = early + early.se)) + 
+    ylab('Early by 1+ min')
 
-ggplot(tu, aes(x = time, y = delay)) +
-    geom_point()
+gridExtra::grid.arrange(plate, pontime, pearly, nrow=3)
 
+
+ggplot(tu, aes(x = time, y = delay/60/60)) +
+    geom_point() +
+    ylab("Delay [HOURS!!]")
+
+
+
+## Load stops into database
+if (!dbExistsTable(con, 'stops')) {
+    url <- "https://cdn01.at.govt.nz/data/stops.txt"
+    dbWriteTable(con, 'stops', read_csv(url), overwrite = TRUE)
+}
+stops_tbl <- tbl(con, 'stops')
+
+stopdelays <- trip_updates %>%
+    select(stop_id, departure_delay) %>%
+    filter(!is.na(departure_delay) & departure_delay > -60*60 & 
+        departure_delay < 60 * 60) %>%
+    group_by(stop_id) %>%
+    summarize(delay = median(departure_delay, na.rm = TRUE)) %>%
+    arrange(abs(delay)) %>%
+    inner_join(stops_tbl %>% select(stop_id, stop_lat, stop_lon), by = "stop_id") %>%
+    mutate(ontime = case_when(delay < 0 ~ 'early',
+                              delay >= 0 ~ 'late',
+                              TRUE ~ 'ontime')) %>%
+    collect()
+
+xr <- extendrange(stopdelays$stop_lon)
+yr <- extendrange(stopdelays$stop_lat)
+bbox <- c(xr[1], yr[1], xr[2], yr[2])
+akl <- get_stamenmap(bbox = bbox, zoom = 10,  maptype = "toner-lite")
+
+dlymax <- max(abs(stopdelays$delay/60))
+ggmap(akl) +
+    geom_point(aes(x = stop_lon, y = stop_lat, color = delay/60,
+                   size = abs(delay/60)),
+               data = stopdelays %>% filter(ontime != 'ontime')) +
+    labs(color = 'Median delay', size = '') +
+    facet_grid(~ontime) +
+    scale_colour_viridis(limits = c(-dlymax, dlymax), option="C") +
+    scale_radius(range = c(0, 10))
+ 
+stopdelays2 <- trip_updates %>%
+    select(stop_id, timestamp, departure_delay) %>%
+    filter(!is.na(departure_delay) & departure_delay > -60*60 & 
+        departure_delay < 60 * 60) %>%
+    inner_join(stops_tbl %>% select(stop_id, stop_lat, stop_lon), by = "stop_id") %>%
+    collect() %>%
+    mutate(timestamp = as.POSIXct(timestamp, origin = '1970-01-01'),
+           time = as.numeric(format(timestamp, '%H')) +
+               as.numeric(format(timestamp, '%M')) / 60,
+           peak = case_when(between(time, peak$morning[1], peak$morning[2]) ~ 'morning peak',
+                            between(time, peak$evening[1], peak$evening[2]) ~ 'evening peak',
+                            between(time, peak$morning[2], peak$evening[1]) ~ 'off peak',
+                            TRUE ~ ''))
+
+smrystops <- stopdelays2 %>%
+    group_by(stop_id, peak) %>%
+    summarize(delay = median(departure_delay, na.rm = TRUE),
+              stop_lon = mean(stop_lon),
+              stop_lat = mean(stop_lat)) %>%
+    arrange(abs(delay)) %>%
+    ungroup() %>%
+    mutate(peak = factor(peak, levels = c('morning peak', 'off peak', 'evening peak')),
+           ontime = ifelse(delay >= 0, 'late', 'early'),
+           ontime = factor(ontime, levels = c('late', 'early')))
+
+dlymax <- max(abs(smrystops$delay/60))
+ggmap(akl) +
+    geom_point(aes(x = stop_lon, y = stop_lat, color = delay/60,
+                   size = abs(delay/60)),
+               data = smrystops %>% filter(peak != '')) +
+    labs(color = 'Median delay', size = '') +
+    facet_grid(ontime~peak) +
+    scale_colour_viridis(limits = c(-dlymax, dlymax), option="C") +
+    scale_radius(range = c(0, 8))
