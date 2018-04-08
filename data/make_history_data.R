@@ -91,20 +91,20 @@ dothedata <- function(DATES, overwrite = FALSE) {
 }
 
 ca <- commandArgs(TRUE)
-print(ca)
+FORCE <- ifelse(Sys.getenv('FORCE') == "", FALSE, as.logical(Sys.getenv('FORCE')))
 if (length(ca) == 0) {
     ## just do today
     dothedata(Sys.Date(), overwrite = TRUE)
 } else {
-year <- ifelse(length(ca) == 2, ca[2], format(Sys.Date(), "%Y"))
-ca <- eval(parse(text = ca[1]))
-for (i in ca) {
-    START <- as.Date(sprintf("%s-%02d-01", year, i), origin = "1970-01-01")
-    END <- as.Date(sprintf("%s-%02d-01", year, i+1), origin = "1970-01-01") - 1
-    DATES <- as.Date(START:END, origin = "1970-01-01")
-    cat(sprintf("\n***\nDealing with %s %s...\n", format(START, "%B"), year))
-    dothedata(DATES)
-}
+    year <- ifelse(length(ca) == 2, ca[2], format(Sys.Date(), "%Y"))
+    ca <- eval(parse(text = ca[1]))
+    for (i in ca) {
+        START <- as.Date(sprintf("%s-%02d-01", year, i), origin = "1970-01-01")
+        END <- as.Date(sprintf("%s-%02d-01", year, i+1), origin = "1970-01-01") - 1
+        DATES <- as.Date(START:END, origin = "1970-01-01")
+        cat(sprintf("\n***\nDealing with %s %s...\n", format(START, "%B"), year))
+        dothedata(DATES, overwrite = FORCE)
+    }
 }
 
 
