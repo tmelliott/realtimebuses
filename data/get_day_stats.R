@@ -13,20 +13,26 @@ trip_updates <- tbl(con, 'trip_updates')
 peak <- list(morning = c(6, 9.5),
              evening = c(14.5, 19))
 
+
+ggplot(trip_updates, aes(timestamp)) +
+    geom_point(aes(y = arrival_delay), col = viridis(2)[1]) +
+    geom_point(aes(y = departure_delay), col = viridis(2)[2])
+
 ## average trip delay by trip (start) time
 trip.delays <-
-    trip_updates %>%
+    trip_updates %>% collect() %>%
+    mutate(timestamp = as.POSIXct(timestamp, origin = "1970-01-01"),
+           date = format(timestamp, "%Y-%m-%d")) %>%
     filter(!is.na(departure_delay) & stop_sequence > 1) %>%
-    group_by(trip_id) %>%
+    group_by(date, trip_id) %>%
     summarise(time = min(timestamp, na.rm = TRUE),
               delay = mean(departure_delay, na.rm = TRUE)) %>%
     arrange(time) %>%
-    collect() %>%
     mutate(timestamp = as.POSIXct(time, origin = '1970-01-01'),
            time = as.numeric(format(timestamp, '%H')) +
                as.numeric(format(timestamp, '%M')) / 60)
 
-ggplot(trip.delays, aes(x = time, y = delay/60)) +
+ggplot(trip.delays, aes(x = time, y = delay/60, colour = date)) +
     geom_point(alpha = 0.5) +
     ylim(-30, 30) +
     xlab("Time") + ylab("Delay (min)") +
@@ -44,6 +50,7 @@ tu <- trip_updates %>%
                               TRUE ~ 'ontime')) %>%
     collect() %>%
     mutate(timestamp = as.POSIXct(timestamp, origin = '1970-01-01'),
+           date = format(timestamp, "%Y-%m-%d"),
            time = as.numeric(format(timestamp, '%H')) +
                as.numeric(format(timestamp, '%M')) / 60,
            peak = case_when(between(time, peak$morning[1], peak$morning[2]) ~ 'morning peak',
@@ -53,7 +60,7 @@ tu <- trip_updates %>%
     filter(peak != '')
 
 tu %>% filter(delay > -20000 & stop_sequence < 85) %>%
-    group_by(peak) %>%
+    group_by(date, peak) %>%
     summarize(late = mean(ontime == 'late'),
               late.n = sum(ontime == 'late'),
               late.se = sqrt(late * (1 - late) / late.n),
@@ -67,7 +74,7 @@ tu %>% filter(delay > -20000 & stop_sequence < 85) %>%
 
 smry <- tu %>%
     filter(delay > -20000 & stop_sequence < 60) %>%
-    group_by(peak, stop_sequence) %>%
+    group_by(date, peak, stop_sequence) %>%
     summarize(late = mean(ontime == 'late'),
               late.n = sum(ontime == 'late'),
               late.se = sqrt(late * (1 - late) / late.n),
@@ -81,9 +88,19 @@ smry <- tu %>%
     mutate(peak = as.factor(peak))
 smry
 
-p <- ggplot(smry, aes(x = stop_sequence, colour = peak)) +
+p <- ggplot(smry, aes(x = stop_sequence, colour = peak,
+                      lty = date,
+                      group = interaction(date, peak))) +
     xlab('Stop #') + labs(colour = '') +
     scale_y_continuous(labels = function(x) paste0(x * 100, '%'), limits = c(0, 1))
+
+gridExtra::grid.arrange(
+    p + geom_line(aes(y = late)) + ylab('5+ min late'),
+    p + geom_line(aes(y = on.time)) + ylab('On time'),
+    p + geom_line(aes(y = early)) + ylab('1+ min early'),
+    nrow = 3)
+
+
 pontime <- p + 
     geom_errorbar(aes(ymin = on.time - on.time.se, ymax = on.time + on.time.se)) + 
     ylab('On time (1 min early - 5 min late)')
