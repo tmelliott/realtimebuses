@@ -89,15 +89,17 @@ smry <- tu %>%
 smry
 
 p <- ggplot(smry, aes(x = stop_sequence, colour = peak,
-                      lty = date,
+                    #  lty = date,
                       group = interaction(date, peak))) +
     xlab('Stop #') + labs(colour = '') +
+    theme(legend.position = 'none') +
     scale_y_continuous(labels = function(x) paste0(x * 100, '%'), limits = c(0, 1))
 
 gridExtra::grid.arrange(
     p + geom_line(aes(y = late)) + ylab('5+ min late'),
     p + geom_line(aes(y = on.time)) + ylab('On time'),
-    p + geom_line(aes(y = early)) + ylab('1+ min early'),
+    p + geom_line(aes(y = early)) + ylab('1+ min early') +
+    theme(legend.position = 'bottom'),
     nrow = 3)
 
 
@@ -132,7 +134,7 @@ stopdelays <- trip_updates %>%
     filter(!is.na(departure_delay) & departure_delay > -60*60 & 
         departure_delay < 60 * 60) %>%
     group_by(stop_id) %>%
-    summarize(delay = median(departure_delay, na.rm = TRUE)) %>%
+    summarize(delay = mean(departure_delay, na.rm = TRUE)) %>%
     arrange(abs(delay)) %>%
     inner_join(stops_tbl %>% select(stop_id, stop_lat, stop_lon), by = "stop_id") %>%
     mutate(ontime = case_when(delay < 0 ~ 'early',
@@ -140,10 +142,12 @@ stopdelays <- trip_updates %>%
                               TRUE ~ 'ontime')) %>%
     collect()
 
-xr <- extendrange(stopdelays$stop_lon)
-yr <- extendrange(stopdelays$stop_lat)
+xr <- quantile(stopdelays$stop_lon, c(0.25, 0.75)) %>% as.numeric
+## extendrange(stopdelays$stop_lon)
+yr <- quantile(stopdelays$stop_lat, c(0.25, 0.75)) %>% as.numeric
+## extendrange(stopdelays$stop_lat)
 bbox <- c(xr[1], yr[1], xr[2], yr[2])
-akl <- get_stamenmap(bbox = bbox, zoom = 10,  maptype = "toner-lite")
+akl <- get_stamenmap(bbox = bbox, zoom = 13,  maptype = "toner-lite")
 
 dlymax <- max(abs(stopdelays$delay/60))
 ggmap(akl) +
@@ -172,6 +176,7 @@ stopdelays2 <- trip_updates %>%
 smrystops <- stopdelays2 %>%
     group_by(stop_id, peak) %>%
     summarize(delay = median(departure_delay, na.rm = TRUE),
+              count = n(),
               stop_lon = mean(stop_lon),
               stop_lat = mean(stop_lat)) %>%
     arrange(abs(delay)) %>%
@@ -183,9 +188,10 @@ smrystops <- stopdelays2 %>%
 dlymax <- max(abs(smrystops$delay/60))
 ggmap(akl) +
     geom_point(aes(x = stop_lon, y = stop_lat, color = delay/60,
-                   size = abs(delay/60)),
+                   #size = abs(delay/60),
+                   size = count),
                data = smrystops %>% filter(peak != '')) +
     labs(color = 'Median delay', size = '') +
     facet_grid(ontime~peak) +
-    scale_colour_viridis(limits = c(-dlymax, dlymax), option="C") +
+    scale_colour_viridis(option = "C") + #limits = c(-dlymax, dlymax), option="C") +
     scale_radius(range = c(0, 8))

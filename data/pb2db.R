@@ -13,6 +13,7 @@ pb2db <- function(file, db = 'data/history.db') {
     if (grepl("trip_updates", file)) {
         delays <- do.call(bind_rows, lapply(pb, function(x) {
             tu <- x$trip_update
+            if (length(tu$stop_time_update) == 0) return(NULL)
             stu <- tu$stop_time_update[[1]]
             tibble(vehicle_id = tu$vehicle$id,
                    timestamp = as.integer(tu$timestamp),
