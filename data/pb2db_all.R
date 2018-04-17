@@ -1,13 +1,10 @@
 source("data/pb2db.R")
 library(parallel)
 
-cl <- makeCluster(2)
+cl <- makeCluster(6)
 res <- clusterEvalQ(cl, {
-    #source('data/pb2db.R')
-    getwd()
+    source('data/pb2db.R')
 })
-res
-
 rm(res)
 
 DATES <- seq(as.Date("2017-04-01"),
