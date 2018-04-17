@@ -20,7 +20,7 @@ pblapply(DATES, function(DATE) {
                 dir)
     ))
     rm(o)
-    files <- list.files(dir)
+    files <- list.files(dir, full.names = TRUE)
     DB <- sprintf("data/history_%s.db", DATE)
     ## pboptions(type = 'timer')
     invisible(sapply(files, pb2db, db = DB))
