@@ -1,4 +1,5 @@
 ## Move protobuf (.pb) files to a database (.db)
+if (dir.exists("../data")) setwd("..")
 library(RCurl)
 library(RSQLite)
 library(RProtoBuf)
@@ -35,25 +36,5 @@ pb2db <- function(file, db = 'data/history.db') {
     invisible(0)
 }
 
-DATE <- commandArgs(TRUE)[1]
 
-tmp <- tempfile()
-system(
-    sprintf('scp tom@130.216.51.230:/mnt/storage/history/%s/archive_%s.zip %s',
-            gsub('-', '/', DATE, fixed = TRUE), gsub('-', '_', DATE, fixed = TRUE), tmp)
-)
-files <- unzip(tmp, exdir = tempdir())
-unlink(tmp)
 
-pboptions(type = 'timer')
-invisible(pbsapply(files, pb2db))
-
-## copy to main table, removing duplicates in the process
-con <- dbConnect(SQLite(), "data/history.db")
-tbl <- dbReadTable(con, 'tmp')
-dbRemoveTable(con, 'tmp')
-tbl <- tbl[tapply(1:nrow(tbl),
-                  with(tbl, paste(vehicle_id, timestamp)),
-                  function(i) i[1]), ]
-dbWriteTable(con, 'trip_updates', tbl, append = TRUE)
-dbDisconnect(con)
