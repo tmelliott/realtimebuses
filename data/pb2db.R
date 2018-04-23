@@ -12,7 +12,7 @@ pb2db <- function(file, db = 'data/history.db') {
     if (inherits(con, "try-error")) return(1)
     on.exit({
         dbDisconnect(con)
-    }, app = TRUE)
+    }, add = TRUE)
     
     pb <- try(read(transit_realtime.FeedMessage, file)$entity, silent = TRUE)
     if (inherits(pb, "try-error")) return(1)
