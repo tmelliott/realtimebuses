@@ -9,7 +9,7 @@ readProtoFiles(dir = 'assets/protobuf')
 
 pb2db <- function(file, db = 'data/history.db') {
     con <- try(dbConnect(SQLite(), db), silent = TRUE)
-    if (inhertits(con, "try-error")) return(1)
+    if (inherits(con, "try-error")) return(1)
     on.exit({
         dbDisconnect(con)
     }, app = TRUE)
@@ -39,7 +39,7 @@ pb2db <- function(file, db = 'data/history.db') {
     } else {
         
     }
-    
+
     invisible(0)
 }
 
