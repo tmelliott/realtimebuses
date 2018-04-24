@@ -8,6 +8,7 @@ if (file.exists(DB))
 files <- list.files(pattern = "history_.*.db")
 
 file.copy(files[1], DB)
+system(sprintf("chmod 644 %s", DB))
 x <- pblapply(files[-1], function(file) {
     system(sprintf(
         paste(sep="; ",
