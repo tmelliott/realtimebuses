@@ -8,8 +8,8 @@ res <- clusterEvalQ(cl, {
 rm(res)
 
 ## create tmp dir for all of the files
-if (!dir.exists("tmp")) {
-    unlink("tmp")
+if (dir.exists("tmp")) {
+    unlink("tmp", recursive = TRUE, force = TRUE)
 }
 dir.create("tmp")
 
