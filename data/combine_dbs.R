@@ -12,7 +12,7 @@ x <- pblapply(files[-1], function(file) {
     system(sprintf(
         paste(sep="; ",
             "sqlite3 %s 'attach \"%s\" as db",
-            "insert into trip_updates select * from db.trip_updates'",
+            "insert into trip_updates select * from db.trip_updates'"
         ), DB, file))
 })
 
