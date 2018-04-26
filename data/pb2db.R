@@ -8,11 +8,16 @@ library(pbapply)
 readProtoFiles(dir = 'assets/protobuf')
 
 pb2db <- function(file, db = 'data/history.db') {
-    con <- dbConnect(SQLite(), db)
+    con <- try(dbConnect(SQLite(), db), silent = TRUE)
+    if (inherits(con, "try-error")) return(1)
+    on.exit({
+        dbDisconnect(con)
+    }, add = TRUE)
     
-    pb <- read(transit_realtime.FeedMessage, file)$entity
+    pb <- try(read(transit_realtime.FeedMessage, file)$entity, silent = TRUE)
+    if (inherits(pb, "try-error")) return(1)
     if (grepl("trip_updates", file)) {
-        delays <- do.call(bind_rows, lapply(pb, function(x) {
+        delays <- try(do.call(bind_rows, lapply(pb, function(x) {
             tu <- x$trip_update
             if (length(tu$stop_time_update) == 0) return(NULL)
             stu <- tu$stop_time_update[[1]]
@@ -27,12 +32,14 @@ pb2db <- function(file, db = 'data/history.db') {
                    departure_delay = ifelse(stu$has('departure'),
                                             stu$departure$delay, NA))
                    
-        })) 
-        dbWriteTable(con, 'tmp', delays, append = TRUE)
+        })), silent = TRUE)
+        if (inherits(delays, "try-error")) return(1)
+        z <- try(dbWriteTable(con, 'tmp', delays, append = TRUE), silent = TRUE)
+        if (inherits(z, "try-error")) return(1)
     } else {
         
     }
-    dbDisconnect(con)
+
     invisible(0)
 }
 
