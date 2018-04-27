@@ -9,14 +9,22 @@ library(viridis)
 
 db <- 'data/history.db'
 con <- dbConnect(SQLite(), db)
-trip_updates <- tbl(con, 'trip_updates')
+
+DATE <- "2017-04-03" %>% as.Date
+daterange <- as.POSIXct(paste(DATE + 0:1, "00:00:00"))
+tr <- as.numeric(daterange)
+trip_updates <-
+    tbl(con, 'trip_updates') %>%
+    filter(between(timestamp, tr[1], tr[2]))
+
 peak <- list(morning = c(6, 9.5),
              evening = c(14.5, 19))
 
-
+## not very useful
 ggplot(trip_updates, aes(timestamp)) +
     geom_point(aes(y = arrival_delay), col = viridis(2)[1]) +
-    geom_point(aes(y = departure_delay), col = viridis(2)[2])
+    geom_point(aes(y = departure_delay), col = viridis(2)[2]) +
+    ggtitle(format(DATE, "%A, %e %B %Y"))
 
 ## average trip delay by trip (start) time
 trip.delays <-
@@ -37,7 +45,8 @@ ggplot(trip.delays, aes(x = time, y = delay/60, colour = date)) +
     ylim(-30, 30) +
     xlab("Time") + ylab("Delay (min)") +
     geom_hline(yintercept = c(-1, 5), lty = 2, col = 'red') +
-    geom_vline(xintercept = do.call(c, peak), lty = 2, col = 'blue')
+    geom_vline(xintercept = do.call(c, peak), lty = 2, col = 'blue') +
+    ggtitle(format(DATE, "%A, %e %B %Y"))
 
 ## peak vs offpeak ontimeness
 
@@ -96,7 +105,8 @@ p <- ggplot(smry, aes(x = stop_sequence, colour = peak,
     scale_y_continuous(labels = function(x) paste0(x * 100, '%'), limits = c(0, 1))
 
 gridExtra::grid.arrange(
-    p + geom_line(aes(y = late)) + ylab('5+ min late'),
+    p + geom_line(aes(y = late)) + ylab('5+ min late') +
+    ggtitle(format(DATE, "%A, %e %B %Y")),
     p + geom_line(aes(y = on.time)) + ylab('On time'),
     p + geom_line(aes(y = early)) + ylab('1+ min early') +
     theme(legend.position = 'bottom'),
@@ -125,9 +135,14 @@ ggplot(tu, aes(x = time, y = delay/60/60)) +
 ## Load stops into database
 if (!dbExistsTable(con, 'stops')) {
     url <- "https://cdn01.at.govt.nz/data/stops.txt"
-    dbWriteTable(con, 'stops', read_csv(url), overwrite = TRUE)
+    st <- read_csv(url)
+    vid <- unique(gsub(".+_v", "", st$stop_id))[1]
+    st <- st[grepl(vid, st$stop_id), ]
+    st$stop_id <- gsub("-.+", "", st$stop_id)
+    dbWriteTable(con, 'stops', st, overwrite = TRUE)
 }
-stops_tbl <- tbl(con, 'stops')
+stops_tbl <- tbl(con, 'stops') %>%
+    select(stop_id, stop_lat, stop_lon) %>% collect()
 
 stopdelays <- trip_updates %>%
     select(stop_id, departure_delay) %>%
@@ -135,12 +150,12 @@ stopdelays <- trip_updates %>%
         departure_delay < 60 * 60) %>%
     group_by(stop_id) %>%
     summarize(delay = mean(departure_delay, na.rm = TRUE)) %>%
-    arrange(abs(delay)) %>%
-    inner_join(stops_tbl %>% select(stop_id, stop_lat, stop_lon), by = "stop_id") %>%
+    collect() %>%
+    mutate(stop_id = gsub("-.+", "", stop_id)) %>%
+    inner_join(stops_tbl, by = "stop_id") %>%
     mutate(ontime = case_when(delay < 0 ~ 'early',
                               delay >= 0 ~ 'late',
-                              TRUE ~ 'ontime')) %>%
-    collect()
+                              TRUE ~ 'ontime'))
 
 xr <- quantile(stopdelays$stop_lon, c(0.25, 0.75)) %>% as.numeric
 ## extendrange(stopdelays$stop_lon)
@@ -162,8 +177,10 @@ ggmap(akl) +
 stopdelays2 <- trip_updates %>%
     select(stop_id, timestamp, departure_delay) %>%
     filter(!is.na(departure_delay) & departure_delay > -60*60 & 
-        departure_delay < 60 * 60) %>%
-    inner_join(stops_tbl %>% select(stop_id, stop_lat, stop_lon), by = "stop_id") %>%
+           departure_delay < 60 * 60) %>%
+    collect() %>%
+    mutate(stop_id = gsub("-.+", "", stop_id)) %>%
+    inner_join(stops_tbl, by = "stop_id") %>%
     collect() %>%
     mutate(timestamp = as.POSIXct(timestamp, origin = '1970-01-01'),
            time = as.numeric(format(timestamp, '%H')) +
@@ -192,6 +209,6 @@ ggmap(akl) +
                    size = count),
                data = smrystops %>% filter(peak != '')) +
     labs(color = 'Median delay', size = '') +
-    facet_grid(ontime~peak) +
+    facet_grid(peak~ontime) +
     scale_colour_viridis(option = "C") + #limits = c(-dlymax, dlymax), option="C") +
     scale_radius(range = c(0, 8))
