@@ -1,13 +1,13 @@
 library(tidyverse)
 library(dbplyr)
 library(RSQLite)
+library(lubridate)
 
 con <- dbConnect(SQLite(), "history.db")
 
 delays <- tbl(con, 'trip_updates') %>%
     mutate(date = strftime('%Y-%m-%d', datetime(timestamp, 'unixepoch', 'localtime')),
            time = strftime('%H:%M:%S', datetime(timestamp, 'unixepoch', 'localtime')))
-
 
 daysmry <- list(overall = list(),
                 peak = list(),
@@ -16,9 +16,10 @@ daysmry <- list(overall = list(),
 
 DATES <- seq(as.Date("2017-04-01"), as.Date("2018-04-01") - 1, by = 1) %>% as.character
 
-DATES <- DATES[1]
+TSTART <- Sys.time()
+cat(" * Processing ")
 for (DATE in DATES) {
-
+    cat("\r * Processing", DATE)
     pt <- as.POSIXct(paste(DATE, c("6:00:00", "9:30:00", "14:30:00", "19:00:00"))) %>%
         as.numeric
     
@@ -65,9 +66,20 @@ for (DATE in DATES) {
     daysmry$peak[[DATE]] <- pct.peak %>% collect
     daysmry$stop[[DATE]] <- pct.stop %>% collect
     daysmry$peak.stop[[DATE]] <- pct.peak.stop %>% collect
+
+    save(daysmry, file = "summary.rda.partial")
+    file.rename("summary.rda.partial", "summary.rda")
 }
 
-save(daysmry, file = "summary.rda")
+TEND <- Sys.time()
+TDIFF <- as.numeric(TEND - TSTART)
+diffstring <- try({
+    gsub(".+~|)", "", as.character(dseconds(TDIFF)))
+}, silent = TRUE)
+if (inherits(diffstring, "try-error")) 
+    diffstring <- paste(TDIFF, "seconds")
+
+cat(sep = "", "\r * Processing complete (", diffstring, ")\n")
 
 ## ggplot(d, aes(x = departure_delay / 60)) +
 ##     geom_density(fill = 'gray') +
