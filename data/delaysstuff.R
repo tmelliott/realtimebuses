@@ -67,6 +67,8 @@ for (DATE in DATES) {
     daysmry$peak.stop[[DATE]] <- pct.peak.stop %>% collect
 }
 
+save(daysmry, file = "summary.rda")
+
 ## ggplot(d, aes(x = departure_delay / 60)) +
 ##     geom_density(fill = 'gray') +
 ##     xlim(-20, 30) +
