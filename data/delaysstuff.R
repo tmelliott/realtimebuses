@@ -14,7 +14,7 @@ daysmry <- list(overall = list(),
                 stop = list(),
                 peak.stop = list())
 
-DATES <- seq(as.Date("2017-04-01"), as.Date("2018-04-01") - 1, by = 1)
+DATES <- seq(as.Date("2017-04-01"), as.Date("2018-04-01") - 1, by = 1) %>% as.character
 
 DATES <- DATES[1]
 for (DATE in DATES) {
