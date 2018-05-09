@@ -7,6 +7,125 @@ library(lubridate)
 library(ggmap)
 library(viridis)
 
+
+load('summary.rda')
+
+dows <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+          "Saturday", "Sunday")
+smry.overall <- do.call(
+    bind_rows,
+    lapply(names(daysmry$overall),
+           function(x)
+               daysmry$overall[[x]] %>%
+               add_column(date = ymd(x), .before = 1))) %>%
+    mutate(dow = date %>% format("%A") %>%
+               factor(levels = dows))
+
+p1 <- ggplot(smry.overall, aes(date)) +
+    geom_line(aes(y = percent_ontime*100)) +
+    geom_point(aes(y = percent_ontime*100, size = n)) +
+    ylim(0, 100)
+
+p1
+p1 + facet_grid(dow~.)
+
+
+
+smry.peak <- do.call(
+    bind_rows,
+    lapply(names(daysmry$peak),
+           function(x)
+               daysmry$peak[[x]] %>%
+               filter(peak != "") %>%
+               add_column(date = ymd(x), .before = 1))) %>%
+    mutate(dow = date %>% format("%A") %>%
+               factor(levels = dows))
+
+p2 <- ggplot(smry.peak, aes(date, group = peak, colour = peak)) +
+    geom_line(aes(y = percent_ontime * 100)) +
+    geom_point(aes(y = percent_ontime * 100, size = n)) +
+    ylim(0, 100)
+
+p2
+p2 + facet_grid(dow~.)
+
+
+
+smry.stop <- do.call(
+    bind_rows,
+    lapply(names(daysmry$stop),
+           function(x)
+               daysmry$stop[[x]] %>%
+               add_column(date = ymd(x), .before = 1))) %>%
+    mutate(dow = date %>% format("%A") %>%
+               factor(levels = dows))
+
+p3.1 <- ggplot(smry.stop %>% filter(stop_sequence == 1),
+               aes(date)) +
+    geom_line(aes(y = percent_ontime * 100)) +
+    geom_point(aes(y = percent_ontime * 100, size = n)) +
+    ylim(0, 100)
+
+p3.1
+p3.1 + facet_grid(dow~.)
+
+
+p3 <- ggplot(smry.stop %>% filter(stop_sequence < 21),
+             aes(stop_sequence)) + #, colour = date %>% as.factor)) +
+    geom_line(aes(y = percent_ontime * 100, group = date)) + 
+    geom_point(aes(y = percent_ontime * 100)) ##, size = n)) +
+    #ylim(0, 100) +
+    #scale_colour_viridis()
+
+p3
+p3 + facet_wrap(~dow)
+
+
+smry.peak.stop <- do.call(
+    bind_rows,
+    lapply(names(daysmry$peak.stop),
+           function(x)
+               daysmry$peak.stop[[x]] %>%
+               filter(peak != "") %>%
+               add_column(date = ymd(x), .before = 1))) %>%
+    mutate(dow = date %>% format("%A") %>%
+               factor(levels = dows)) %>%
+    ungroup
+
+p4 <- ggplot(smry.peak.stop %>% filter(stop_sequence < 31),
+             aes(stop_sequence, colour = peak)) + 
+    geom_line(aes(y = percent_ontime * 100,
+                  group = interaction(peak, date))) + 
+    geom_point(aes(y = percent_ontime * 100))
+
+p4
+p4 + facet_grid(peak ~ dow) + theme(legend.position = 'bottom')
+
+fit <- glm(percent_ontime ~ peak * poly(stop_sequence-1,7) * dow,
+           data = smry.peak.stop, family = binomial,
+           weights = n)
+summary(fit)
+
+smry.peak.stop <- smry.peak.stop %>%
+    mutate(phat = predict(fit, type = "response"),
+           pse = predict(fit, type = "response", se.fit = TRUE)$se.fit)
+
+ggplot(smry.peak.stop %>% filter(stop_sequence < 31),
+       aes(stop_sequence, colour = peak)) +
+    geom_line(aes(y = percent_ontime * 100, alpha = 0.5,
+                  group = interaction(peak,date))) +
+    geom_ribbon(aes(ymin = 100*(phat - 1.96*pse),
+                    ymax = 100*(phat + 1.96*pse),
+                    fill = peak), alpha = 1) +
+    facet_wrap( ~ dow)
+
+
+
+
+
+
+########### The old script
+
 db <- 'data/history.db'
 con <- dbConnect(SQLite(), db)
 
