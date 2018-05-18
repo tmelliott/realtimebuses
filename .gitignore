@@ -2,6 +2,7 @@ _site
 .idea
 node_modules
 
+*.rda
 *.db 
 
 *.Rdump
