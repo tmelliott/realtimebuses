@@ -23,8 +23,8 @@ smry.overall <- do.call(
 
 p1 <- ggplot(smry.overall, aes(date)) +
     geom_line(aes(y = percent_ontime*100)) +
-    geom_point(aes(y = percent_ontime*100, size = n)) +
-    ylim(0, 100)
+    geom_point(aes(y = percent_ontime*100, size = n))# +
+#    ylim(0, 100)
 
 p1
 p1 + facet_grid(dow~.)
@@ -43,8 +43,8 @@ smry.peak <- do.call(
 
 p2 <- ggplot(smry.peak, aes(date, group = peak, colour = peak)) +
     geom_line(aes(y = percent_ontime * 100)) +
-    geom_point(aes(y = percent_ontime * 100, size = n)) +
-    ylim(0, 100)
+    geom_point(aes(y = percent_ontime * 100, size = n))# +
+#ylim(0, 100)
 
 p2
 p2 + facet_grid(dow~.)
@@ -63,11 +63,72 @@ smry.stop <- do.call(
 p3.1 <- ggplot(smry.stop %>% filter(stop_sequence == 1),
                aes(date)) +
     geom_line(aes(y = percent_ontime * 100)) +
-    geom_point(aes(y = percent_ontime * 100, size = n)) +
-    ylim(0, 100)
+    geom_line(aes(y = percent_early * 100), colour = "blue") +
+    geom_line(aes(y = percent_late * 100), colour = "orangered") +
+    ##geom_point(aes(y = percent_ontime * 100, size = n)) +
+    ##ylim(0, 100) +
+    xlab("Date") + ylab("Percent %") + ggtitle("First stop performance") +
+    scale_y_continuous(breaks = 20*0:5,  expand = c(0, 0)) +
+    geom_text(aes(x = date, y = val*100, label = text),
+              data = tibble(
+                  date = min(smry.stop$date),
+                  val = smry.stop %>%
+                      filter(stop_sequence == 1 &
+                             date == min(smry.stop$date)) %>%
+                      select(percent_ontime, percent_early, percent_late) %>%
+                      as.numeric,
+                  text = c("ontime", "early", "late")), nudge_x = -12)
 
-p3.1
+p3.1 + geom_vline(xintercept = as.Date("2017-10-17"), col = "magenta", lty = 2)
 p3.1 + facet_grid(dow~.)
+
+p3.2 <- ggplot(smry.stop %>% filter(stop_sequence == 2),
+               aes(date)) +
+    geom_line(aes(y = percent_ontime * 100)) +
+    geom_line(aes(y = percent_early * 100), colour = "blue") +
+    geom_line(aes(y = percent_late * 100), colour = "orangered") +
+    ##geom_point(aes(y = percent_ontime * 100, size = n)) +
+    ##ylim(0, 100) +
+    xlab("Date") + ylab("Percent %") + ggtitle("Second stop performance") +
+    scale_y_continuous(breaks = 20*0:5, limits = c(0, 100), expand = c(0, 0)) +
+    geom_text(aes(x = date, y = val*100, label = text),
+              data = tibble(
+                  date = min(smry.stop$date),
+                  val = smry.stop %>%
+                      filter(stop_sequence == 1 &
+                             date == min(smry.stop$date)) %>%
+                      select(percent_ontime, percent_early, percent_late) %>%
+                      as.numeric,
+                  text = c("ontime", "early", "late")), nudge_x = -12)
+
+p3.2
+p3.2 + facet_grid(dow~.)
+
+
+p3.3 <- ggplot(smry.stop %>% filter(stop_sequence == 3),
+               aes(date)) +
+    geom_line(aes(y = percent_ontime * 100)) +
+    geom_line(aes(y = percent_early * 100), colour = "blue") +
+    geom_line(aes(y = percent_late * 100), colour = "orangered") +
+    ##geom_point(aes(y = percent_ontime * 100, size = n)) +
+    ##ylim(0, 100) +
+    xlab("Date") + ylab("Percent %") + ggtitle("Third stop performance") +
+    scale_y_continuous(breaks = 20*0:5, limits = c(0, 100), expand = c(0, 0)) +
+    geom_text(aes(x = date, y = val*100, label = text),
+              data = tibble(
+                  date = min(smry.stop$date),
+                  val = smry.stop %>%
+                      filter(stop_sequence == 1 &
+                             date == min(smry.stop$date)) %>%
+                      select(percent_ontime, percent_early, percent_late) %>%
+                      as.numeric,
+                  text = c("ontime", "early", "late")), nudge_x = -12)
+
+p3.3
+p3.3 + facet_grid(dow~.)
+
+
+
 
 
 p3 <- ggplot(smry.stop %>% filter(stop_sequence < 21),
@@ -91,6 +152,14 @@ smry.peak.stop <- do.call(
     mutate(dow = date %>% format("%A") %>%
                factor(levels = dows)) %>%
     ungroup
+
+p4.1 <- ggplot(smry.peak.stop %>% filter(stop_sequence == 1),
+               aes(date, colour = peak)) +
+    geom_line(aes(y = percent_ontime * 100)) +
+    geom_point(aes(y = percent_ontime * 100, size = n))
+
+p4.1
+p4.1 + facet_grid(dow~.)
 
 p4 <- ggplot(smry.peak.stop %>% filter(stop_sequence < 31),
              aes(stop_sequence, colour = peak)) + 
