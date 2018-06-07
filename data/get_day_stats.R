@@ -212,12 +212,17 @@ ggplot(smry.peak.stop %>% filter(stop_sequence < 31),
 
 
 ########### The old script
+library(tidyverse)
+library(ggplot2)
+library(RSQLite)
+library(dbplyr)
+library(viridis)
 
 db <- 'data/history.db'
 con <- dbConnect(SQLite(), db)
 
-DATE <- "2017-04-03" %>% as.Date
-daterange <- as.POSIXct(paste(DATE + 0:1, "00:00:00"))
+DATE <- "2017-10-16" %>% as.Date
+daterange <- as.POSIXct(paste(DATE + 0:2, "00:00:00"))
 tr <- as.numeric(daterange)
 trip_updates <-
     tbl(con, 'trip_updates') %>%
@@ -227,10 +232,10 @@ peak <- list(morning = c(6, 9.5),
              evening = c(14.5, 19))
 
 ## not very useful
-ggplot(trip_updates, aes(timestamp)) +
-    geom_point(aes(y = arrival_delay), col = viridis(2)[1]) +
-    geom_point(aes(y = departure_delay), col = viridis(2)[2]) +
-    ggtitle(format(DATE, "%A, %e %B %Y"))
+ggplot(trip_updates, aes(as.POSIXct(timestamp, origin = "1970-01-01"))) +
+    geom_point(aes(y = departure_delay / 60)) +
+    ggtitle(format(DATE, "%A, %e %B %Y")) + xlab("Time") + ylab("Delay (minutes)")
+    # geom_point(aes(y = arrival_delay), col = viridis(2)[1]) +
 
 ## average trip delay by trip (start) time
 trip.delays <-
