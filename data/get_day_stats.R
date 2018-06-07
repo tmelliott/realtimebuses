@@ -161,15 +161,33 @@ p4.1 <- ggplot(smry.peak.stop %>% filter(stop_sequence == 1),
 p4.1
 p4.1 + facet_grid(dow~.)
 
-p4 <- ggplot(smry.peak.stop %>% filter(stop_sequence < 31),
-             aes(stop_sequence, colour = peak)) + 
+p4 <- ggplot(smry.peak.stop %>% filter(stop_sequence < 31) %>%
+             mutate(BREAK = ifelse(date >= ymd("2017-10-17"), 'after', 'before') %>%
+                        factor(levels = c('before', 'after'))),
+             aes(stop_sequence, colour = BREAK)) + 
     geom_line(aes(y = percent_ontime * 100,
-                  group = interaction(peak, date))) + 
+                  group = interaction(peak, date))) +
     geom_point(aes(y = percent_ontime * 100))
 
-p4
-p4 + facet_grid(peak ~ dow) + theme(legend.position = 'bottom')
+p4 + facet_grid(~peak)
+p4 + facet_grid(~ dow) + theme(legend.position = 'bottom')
+p4 + facet_grid(peak~ dow) + theme(legend.position = 'bottom')
 
+
+### Combined ontime/early/late
+smry.all <- smry.peak.stop %>%
+    gather('delay', 'percent', percent_ontime, percent_early, percent_late)
+
+ggplot(smry.all %>% filter(stop_sequence == 1) %>%
+       mutate(BREAK = factor(ifelse(date >= ymd("2017-10-17"), "after", "before"),
+                             levels = c("before", "after"))),
+       aes(date, percent * 100, colour = delay)) +
+    geom_line(aes(group = interaction(delay))) +
+    facet_grid(peak~.)
+
+
+
+### Modeling
 fit <- glm(percent_ontime ~ peak * poly(stop_sequence-1,7) * dow,
            data = smry.peak.stop, family = binomial,
            weights = n)
