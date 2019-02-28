@@ -9,6 +9,8 @@ node_modules
 *.csv
 *.log
 
+data/at_state.html
+
 # Created by https://www.gitignore.io
 
 ### OSX ###
