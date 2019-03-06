@@ -1,15 +1,5 @@
-_site
-.idea
+
 node_modules
-
-*.rda
-*.db 
-
-*.Rdump
-*.csv
-*.log
-
-data/at_state.html
 
 # Created by https://www.gitignore.io
 
