@@ -13,7 +13,7 @@ dothedata <- function(DATES, overwrite = FALSE) {
     if (!overwrite)
         DATES <- DATES[sapply(DATES, function(x) !any(grepl(x, list.files('data/history'))))]
     if (length(DATES) == 0) return()
-    con <- "tom@130.216.51.230"
+    con <- sprintf("tom@%s", Sys.getenv("pi_ip"))
     Nhistory <- matrix(0L, ncol = 5, nrow = (24 - 5) * (60 / 5) * length(DATES))
     Qhistory <- matrix(0.0, ncol = 6, nrow = (24 - 5) * (60 / 5) * length(DATES))
     Times <- vector('integer', nrow(Nhistory))
